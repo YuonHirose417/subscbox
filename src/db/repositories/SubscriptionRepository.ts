@@ -23,6 +23,8 @@ export interface SubscriptionRepository {
   duplicate(id: string): Promise<Subscription>;
   /** status=cancelled、cancelled_at を記録 */
   cancel(id: string, at: string): Promise<Subscription>;
+  /** 解約済みを契約中に戻す（解約日はクリア） */
+  reactivate(id: string): Promise<Subscription>;
   getPriceHistory(): Promise<PriceHistoryEntry[]>;
   /** 過去日になった次回更新日を繰り越し、件数を返す */
   rollForwardRenewals(today: DateString): Promise<number>;

@@ -1,14 +1,35 @@
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { useSubscriptionsBootstrap } from '@/features/subscriptions/hooks/useSubscriptionsBootstrap';
+import { ErrorState } from '@/components/ui';
+import { useAppInit } from '@/features/app/useAppInit';
 import { ThemeProvider, useTheme } from '@/theme';
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function RootStack() {
   const { colors, scheme } = useTheme();
-  useSubscriptionsBootstrap();
+  const { status, retry } = useAppInit();
+
+  useEffect(() => {
+    if (status !== 'loading') SplashScreen.hideAsync().catch(() => {});
+  }, [status]);
+
+  if (status === 'loading') return null; // スプラッシュを表示したまま待つ
+
+  if (status === 'error') {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', backgroundColor: colors.background }}>
+        <ErrorState onRetry={retry} />
+      </View>
+    );
+  }
+
   return (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
@@ -18,7 +39,7 @@ function RootStack() {
           headerShown: false,
           contentStyle: { backgroundColor: colors.background },
         }}>
-        <Stack.Screen name="add/index" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="add" options={{ presentation: 'modal' }} />
       </Stack>
     </>
   );

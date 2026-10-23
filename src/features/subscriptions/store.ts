@@ -1,7 +1,5 @@
 import { create } from 'zustand';
 
-import { buildSampleData } from '@/data/sampleSubscriptions';
-import { InMemorySubscriptionRepository } from '@/db/repositories/InMemorySubscriptionRepository';
 import type { SubscriptionRepository } from '@/db/repositories/SubscriptionRepository';
 import { today as todayString } from '@/domain/dates';
 import type { PriceHistoryEntry, Subscription, SubscriptionInput } from '@/domain/types';
@@ -19,15 +17,19 @@ type SubscriptionState = {
   remove: (id: string) => Promise<void>;
   duplicate: (id: string) => Promise<Subscription>;
   cancel: (id: string) => Promise<Subscription>;
+  reactivate: (id: string) => Promise<Subscription>;
 };
 
-// フェーズ2はサンプルデータ入りのメモリ実装。フェーズ3で SQLite 実装に差し替える
-let repository: SubscriptionRepository = new InMemorySubscriptionRepository(buildSampleData());
+let current: SubscriptionRepository | null = null;
 
-/** 開発用：リポジトリを差し替えて読み直す（空状態の確認など） */
-export async function replaceRepositoryForDev(next: SubscriptionRepository) {
-  repository = next;
-  await useSubscriptionStore.getState().load();
+/** 起動時に SQLite 実装を設定する（テストでは InMemory 実装を渡せる） */
+export function setSubscriptionRepository(next: SubscriptionRepository) {
+  current = next;
+}
+
+function repo(): SubscriptionRepository {
+  if (!current) throw new Error('SubscriptionRepository is not set');
+  return current;
 }
 
 /**
@@ -37,8 +39,8 @@ export async function replaceRepositoryForDev(next: SubscriptionRepository) {
 export const useSubscriptionStore = create<SubscriptionState>((set, get) => {
   async function refresh() {
     const [items, priceHistory] = await Promise.all([
-      repository.list({ status: 'all' }),
-      repository.getPriceHistory(),
+      repo().list({ status: 'all' }),
+      repo().getPriceHistory(),
     ]);
     set({ items, priceHistory, status: 'ready' });
   }
@@ -51,7 +53,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => {
     async load() {
       if (get().status !== 'ready') set({ status: 'loading' });
       try {
-        await repository.rollForwardRenewals(todayString());
+        await repo().rollForwardRenewals(todayString());
         await refresh();
       } catch (error) {
         logger.error('failed to load subscriptions', error);
@@ -60,32 +62,38 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => {
     },
 
     async create(input) {
-      const created = await repository.create(input);
+      const created = await repo().create(input);
       await refresh();
       return created;
     },
 
     async update(id, input) {
-      const updated = await repository.update(id, input);
+      const updated = await repo().update(id, input);
       await refresh();
       return updated;
     },
 
     async remove(id) {
-      await repository.remove(id);
+      await repo().remove(id);
       await refresh();
     },
 
     async duplicate(id) {
-      const copy = await repository.duplicate(id);
+      const copy = await repo().duplicate(id);
       await refresh();
       return copy;
     },
 
     async cancel(id) {
-      const cancelled = await repository.cancel(id, new Date().toISOString());
+      const cancelled = await repo().cancel(id, new Date().toISOString());
       await refresh();
       return cancelled;
+    },
+
+    async reactivate(id) {
+      const active = await repo().reactivate(id);
+      await refresh();
+      return active;
     },
   };
 });

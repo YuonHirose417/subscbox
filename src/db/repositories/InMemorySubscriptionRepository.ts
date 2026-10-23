@@ -123,6 +123,19 @@ export class InMemorySubscriptionRepository implements SubscriptionRepository {
     return clone(next);
   }
 
+  async reactivate(id: string): Promise<Subscription> {
+    const index = this.items.findIndex((s) => s.id === id);
+    if (index < 0) throw new AppError('NOT_FOUND', `subscription ${id} not found`);
+    const next: Subscription = {
+      ...this.items[index],
+      status: 'active',
+      cancelledAt: null,
+      updatedAt: this.now().toISOString(),
+    };
+    this.items[index] = next;
+    return clone(next);
+  }
+
   async getPriceHistory(): Promise<PriceHistoryEntry[]> {
     return clone(this.history);
   }

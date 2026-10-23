@@ -91,3 +91,37 @@ export type ExchangeRates = Partial<Record<CurrencyCode, number>>;
 export type Period = 'month' | 'year' | 'all';
 
 export type SortOrder = 'created' | 'renewal' | 'amountDesc' | 'amountAsc' | 'name';
+
+export type PaymentMethodType = 'credit_card' | 'debit_card' | 'apple_id' | 'carrier' | 'other';
+
+/** 支払い方法（payment_methods テーブル）。カード番号は下4桁のみ保持する */
+export type PaymentMethod = {
+  id: string;
+  type: PaymentMethodType;
+  /** 任意の呼び名（例：「楽天カード」） */
+  label: string | null;
+  last4: string | null;
+  sortOrder: number;
+  createdAt: DateTimeString;
+  updatedAt: DateTimeString;
+};
+
+export type PaymentMethodInput = Pick<PaymentMethod, 'type' | 'label' | 'last4'>;
+
+export type CategoryInput = Pick<Category, 'name' | 'color' | 'icon'>;
+
+/**
+ * 支払い履歴（payments テーブル・プレミアム）。請求予定日から自動生成し、
+ * ユーザーが個別に修正・削除できる。削除は status='skipped' で残し、再生成で復活させない。
+ */
+export type Payment = {
+  id: string;
+  subscriptionId: string;
+  billedOn: DateString;
+  amountMinor: number;
+  currency: CurrencyCode;
+  status: 'paid' | 'skipped';
+  isUserEdited: boolean;
+  createdAt: DateTimeString;
+  updatedAt: DateTimeString;
+};

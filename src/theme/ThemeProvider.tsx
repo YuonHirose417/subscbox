@@ -1,5 +1,6 @@
 import { createContext, useMemo, type ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
+import { Easing, type EasingFunction } from 'react-native-reanimated';
 
 import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore } from '@/features/settings/store';
@@ -29,10 +30,12 @@ export type Theme = {
   radius: typeof radius;
   shadow: string | undefined;
   accentShadow: string | undefined;
-  motion: typeof motion;
+  motion: typeof motion & { easing: EasingFunction };
   sizes: typeof sizes;
   typography: typeof typography;
 };
+
+const themeMotion = { ...motion, easing: Easing.out(Easing.cubic) };
 
 export const ThemeContext = createContext<Theme | null>(null);
 
@@ -56,7 +59,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       radius,
       shadow: shadows[scheme],
       accentShadow: accentShadow[scheme],
-      motion,
+      motion: themeMotion,
       sizes,
       typography,
     }),

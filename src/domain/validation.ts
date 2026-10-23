@@ -1,5 +1,5 @@
 import { isDateString } from './dates';
-import { isCurrencyCode } from './money';
+import { fromMinor, isCurrencyCode } from './money';
 import type { SubscriptionInput } from './types';
 
 export const LIMITS = {
@@ -31,12 +31,23 @@ export function validateSubscriptionInput(input: SubscriptionInput): ValidationE
   if (!isCurrencyCode(input.currency)) errors.currency = '通貨を選択してください';
   if (!Number.isInteger(input.amountMinor) || input.amountMinor <= 0) {
     errors.amountMinor = '0より大きい金額を入力してください';
+  } else if (
+    isCurrencyCode(input.currency) &&
+    fromMinor(input.amountMinor, input.currency) > LIMITS.amountMax
+  ) {
+    errors.amountMinor = '金額が大きすぎます';
   }
   if (!Number.isInteger(input.cycle.interval) || input.cycle.interval < 1) {
     errors.cycle = '支払い周期を正しく入力してください';
   }
   if (!isDateString(input.startDate)) errors.startDate = '契約開始日を選択してください';
   if (!isDateString(input.nextRenewalDate)) errors.nextRenewalDate = '次回更新日を選択してください';
+  if (
+    input.notification.daysBefore < 0 ||
+    !/^([01]\d|2[0-3]):[0-5]\d$/.test(input.notification.time)
+  ) {
+    errors.notification = '通知のタイミングを正しく設定してください';
+  }
   if (input.url && !isAllowedUrl(input.url)) {
     errors.url = 'http:// または https:// で始まるURLを入力してください';
   }

@@ -1,5 +1,7 @@
 import { buildSampleData } from '@/data/sampleSubscriptions';
+import { migrate } from '@/db/migrations';
 import { InMemorySubscriptionRepository } from '@/db/repositories/InMemorySubscriptionRepository';
+import { SqliteSubscriptionRepository } from '@/db/repositories/SqliteSubscriptionRepository';
 import type { SubscriptionRepository } from '@/db/repositories/SubscriptionRepository';
 import { currentMonthlyTotal, monthOverMonth } from '@/domain/aggregation';
 import { toInput } from '@/domain/subscription';
@@ -7,12 +9,15 @@ import type { SubscriptionInput } from '@/domain/types';
 import { isAppError } from '@/utils/errors';
 
 import { makeSub } from '../domain/fixtures';
+import { createNodeSqliteDb, loadNodeSqlite } from './nodeSqliteDb';
 
-/**
- * Repository の共通テストスイート。フェーズ3で SQLite 実装にも同じスイートを流す。
- */
-function repositorySuite(name: string, factory: (now: () => Date) => SubscriptionRepository) {
-  describe(name, () => {
+/** Repository の共通テストスイート。InMemory と SQLite（node:sqlite）の両方に流す */
+function repositorySuite(
+  name: string,
+  factory: (now: () => Date) => SubscriptionRepository | Promise<SubscriptionRepository>,
+  run: typeof describe = describe,
+) {
+  run(name, () => {
     let clock = new Date('2025-10-17T00:00:00.000Z');
     const now = () => clock;
     let repo: SubscriptionRepository;
@@ -21,9 +26,9 @@ function repositorySuite(name: string, factory: (now: () => Date) => Subscriptio
       ...overrides,
     });
 
-    beforeEach(() => {
+    beforeEach(async () => {
       clock = new Date('2025-10-17T00:00:00.000Z');
-      repo = factory(now);
+      repo = await factory(now);
     });
 
     it('creates and lists in registration order with initial price history', async () => {
@@ -72,8 +77,14 @@ function repositorySuite(name: string, factory: (now: () => Date) => Subscriptio
       expect(copy.id).not.toBe(sub.id);
       expect(copy.name).toBe('Netflix（コピー）');
       const cancelled = await repo.cancel(sub.id, '2025-10-17T01:00:00.000Z');
-      expect(cancelled.status).toBe('cancelled');
+      expect(cancelled).toMatchObject({
+        status: 'cancelled',
+        cancelledAt: '2025-10-17T01:00:00.000Z',
+      });
       expect(await repo.list({ status: 'active' })).toHaveLength(1);
+      expect(await repo.list({ status: 'cancelled' })).toHaveLength(1);
+      expect(await repo.reactivate(sub.id)).toMatchObject({ status: 'active', cancelledAt: null });
+      await repo.cancel(sub.id, '2025-10-17T01:00:00.000Z');
       await repo.remove(sub.id);
       expect(await repo.getById(sub.id)).toBeNull();
       expect((await repo.getPriceHistory()).some((h) => h.subscriptionId === sub.id)).toBe(false);
@@ -98,6 +109,17 @@ repositorySuite('InMemorySubscriptionRepository', (now) => {
   let n = 0;
   return new InMemorySubscriptionRepository({}, { now, generateId: () => `id-${(n += 1)}` });
 });
+
+repositorySuite(
+  'SqliteSubscriptionRepository (node:sqlite)',
+  async (now) => {
+    const db = createNodeSqliteDb();
+    await migrate(db);
+    let n = 0;
+    return new SqliteSubscriptionRepository(db, { now, generateId: () => `id-${(n += 1)}` });
+  },
+  loadNodeSqlite() ? describe : describe.skip,
+);
 
 describe('sample data', () => {
   it('matches the mockup list (8 active, renewal badges relative to today)', () => {

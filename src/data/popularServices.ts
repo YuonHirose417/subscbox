@@ -11,6 +11,8 @@ export type ServicePlanPreset = {
 export type ServicePreset = {
   key: string;
   name: string;
+  /** 「人気のサービス」グリッドの短い表示名（カンプ：YouTube、Adobe） */
+  shortName?: string;
   categoryId: DefaultCategoryId;
   /** ロゴ未配置時の頭文字アイコンの背景色 */
   brandColor: string;
@@ -48,6 +50,7 @@ export const popularServices: readonly ServicePreset[] = [
   {
     key: 'youtube',
     name: 'YouTube Premium',
+    shortName: 'YouTube',
     categoryId: 'video_music',
     brandColor: '#FF0033',
     monogram: 'Y',
@@ -127,6 +130,7 @@ export const popularServices: readonly ServicePreset[] = [
   {
     key: 'adobe',
     name: 'Adobe Creative Cloud',
+    shortName: 'Adobe',
     categoryId: 'productivity',
     brandColor: '#FA0F00',
     monogram: 'A',
@@ -263,6 +267,9 @@ export const popularServices: readonly ServicePreset[] = [
     plans: [{ name: '一般プラン', ...jpy(1080) }],
   },
 ];
+
+/** 「人気のサービス」グリッドに出す8件（カンプの並び） */
+export const featuredServices = popularServices.slice(0, 8);
 
 export const popularServicesByKey: Readonly<Record<string, ServicePreset>> = Object.fromEntries(
   popularServices.map((s) => [s.key, s]),

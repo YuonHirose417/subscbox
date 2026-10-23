@@ -1,5 +1,3 @@
-import { Easing } from 'react-native-reanimated';
-
 /**
  * デザイントークン。色・余白・角丸・影・モーションの値はすべてここで定義し、
  * コンポーネントは useTheme() 経由で参照する（ここ以外で色リテラルを書かない）。
@@ -256,12 +254,12 @@ export const accentShadow: Record<ColorScheme, string | undefined> = {
   dark: undefined,
 };
 
+/** モーション（イージング Easing.out(cubic) は ThemeProvider で付与する） */
 export const motion = {
   duration: 220,
   durationSlow: 400,
   chartDuration: 600,
   barStagger: 30,
-  easing: Easing.out(Easing.cubic),
   pressScale: 0.97,
   spring: { damping: 18, stiffness: 260, mass: 1 },
 } as const;
@@ -275,3 +273,16 @@ export const sizes = {
   buttonHeightSmall: 40,
   hairline: 0.5,
 } as const;
+
+/** 自作カテゴリ・カスタムサービスのアイコンに選べる色 */
+export const customColorChoices = [
+  '#59A6FD',
+  '#FC86A9',
+  '#5FE2D1',
+  '#FECA68',
+  '#818CF8',
+  '#AF7CF8',
+  '#F97316',
+  '#10B981',
+  '#64748B',
+] as const;

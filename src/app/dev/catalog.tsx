@@ -23,9 +23,8 @@ import {
 import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore, type ThemePreference } from '@/features/settings/store';
 import { renewalBadgeTone } from '@/features/subscriptions/renewalBadge';
-import { replaceRepositoryForDev } from '@/features/subscriptions/store';
-import { buildSampleData } from '@/data/sampleSubscriptions';
-import { InMemorySubscriptionRepository } from '@/db/repositories/InMemorySubscriptionRepository';
+import { useSubscriptionStore } from '@/features/subscriptions/store';
+import { clearSubscriptionsForDev, seedSampleDataForDev } from '@/db/devTools';
 import { ja } from '@/i18n/ja';
 import { premiumService } from '@/services/premium';
 import { accentPresets, useTheme, withAlpha, type AccentPresetId } from '@/theme';
@@ -120,20 +119,22 @@ export default function CatalogScreen() {
       <Section title="開発用データ">
         <View style={[styles.row, { gap: spacing.xs }]}>
           <Button
-            title="サンプル（カンプ相当）"
+            title="サンプルを投入"
             size="sm"
             variant="secondary"
             style={{ flex: 1 }}
             onPress={() =>
-              replaceRepositoryForDev(new InMemorySubscriptionRepository(buildSampleData()))
+              seedSampleDataForDev().then(() => useSubscriptionStore.getState().load())
             }
           />
           <Button
-            title="0件にする"
+            title="全件削除"
             size="sm"
             variant="secondary"
             style={{ flex: 1 }}
-            onPress={() => replaceRepositoryForDev(new InMemorySubscriptionRepository())}
+            onPress={() =>
+              clearSubscriptionsForDev().then(() => useSubscriptionStore.getState().load())
+            }
           />
         </View>
       </Section>

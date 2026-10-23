@@ -1,3 +1,5 @@
+import { AppError } from '@/utils/errors';
+
 /** 無料版の上限値。変更はここだけで行う */
 export const FREE_LIMITS = {
   /** サブスクの登録数 */
@@ -21,3 +23,11 @@ export type PremiumFeature =
   | 'accentColor'
   | 'unlimitedPaymentMethods'
   | 'paymentCalendar';
+
+/** 無料版の上限に達したときのエラー（フェーズ7でペイウォール表示に使う） */
+export class LimitReachedError extends AppError {
+  constructor(message: string) {
+    super('VALIDATION', message);
+    this.name = 'LimitReachedError';
+  }
+}

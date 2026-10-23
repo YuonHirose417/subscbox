@@ -22,6 +22,8 @@ type Props = {
   padded?: boolean;
   contentStyle?: StyleProp<ViewStyle>;
   scrollProps?: Omit<ScrollViewProps, 'contentContainerStyle' | 'children'>;
+  /** 上のセーフエリア分の余白（モーダル・シート内では false） */
+  topInset?: boolean;
 };
 
 export function Screen({
@@ -31,13 +33,14 @@ export function Screen({
   padded = true,
   contentStyle,
   scrollProps,
+  topInset = true,
 }: Props) {
   const { colors, spacing } = useTheme();
   const insets = useSafeAreaInsets();
 
   const inner: StyleProp<ViewStyle> = [
     {
-      paddingTop: insets.top + spacing.xs,
+      paddingTop: (topInset ? insets.top : 0) + spacing.xs,
       paddingBottom: insets.bottom + spacing.xxl,
       paddingHorizontal: padded ? spacing.screen : 0,
       gap: spacing.md,
