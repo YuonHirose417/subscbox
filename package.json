@@ -5,6 +5,7 @@
   "dependencies": {
     "@expo/ui": "~58.0.22",
     "@expo/vector-icons": "^15.0.2",
+    "date-fns": "^4.4.0",
     "expo": "~58.0.17",
     "expo-blur": "~58.0.5",
     "expo-constants": "~58.0.13",
@@ -31,12 +32,17 @@
     "react-native-svg": "15.16.0",
     "react-native-web": "~0.21.4",
     "react-native-worklets": "0.13.0",
+    "react-test-renderer": "19.3.0",
     "zustand": "^5.0.16"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^14.1.0",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.3.0",
     "eslint-config-expo": "~58.0.4",
     "eslint-config-prettier": "^10.1.8",
+    "jest": "^30.5.2",
+    "jest-expo": "^58.0.12",
     "prettier": "^3.9.10",
     "typescript": "~6.0.3"
   },
@@ -47,7 +53,21 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "jest",
+    "logos": "node ./scripts/generate-service-logos.js"
   },
-  "private": true
+  "private": true,
+  "jest": {
+    "preset": "jest-expo",
+    "testMatch": [
+      "**/__tests__/**/*.test.ts?(x)"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "collectCoverageFrom": [
+      "src/domain/**/*.ts"
+    ]
+  }
 }

@@ -199,14 +199,17 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
   },
 };
 
-/** カテゴリカラー（グラフ・カテゴリタイル）。タイル背景はこの色の8〜10%不透明度 */
+/**
+ * カテゴリカラー（グラフ・カテゴリタイル）。タイル背景はこの色の8〜10%不透明度。
+ * ホームのドーナツ（カンプ）から採色。SNS はカンプのドーナツに無いため他と区別できる藍色にした。
+ */
 export const categoryColors = {
-  video_music: '#F472B6',
-  productivity: '#FB7185',
-  cloud: '#2DD4BF',
-  game: '#FBBF24',
-  sns: '#A78BFA',
-  other: '#C084FC',
+  video_music: '#59A6FD',
+  productivity: '#FC86A9',
+  cloud: '#5FE2D1',
+  game: '#FECA68',
+  sns: '#818CF8',
+  other: '#AF7CF8',
 } as const;
 
 export type CategoryColorKey = keyof typeof categoryColors;

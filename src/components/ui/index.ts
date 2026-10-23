@@ -16,3 +16,4 @@ export { SegmentedControl, type SegmentOption } from './SegmentedControl';
 export { Skeleton } from './Skeleton';
 export { Toggle } from './Toggle';
 export { ScreenHeader } from './ScreenHeader';
+export { CountUpText } from './CountUpText';

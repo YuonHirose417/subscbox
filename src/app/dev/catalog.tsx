@@ -23,6 +23,9 @@ import {
 import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore, type ThemePreference } from '@/features/settings/store';
 import { renewalBadgeTone } from '@/features/subscriptions/renewalBadge';
+import { replaceRepositoryForDev } from '@/features/subscriptions/store';
+import { buildSampleData } from '@/data/sampleSubscriptions';
+import { InMemorySubscriptionRepository } from '@/db/repositories/InMemorySubscriptionRepository';
 import { ja } from '@/i18n/ja';
 import { premiumService } from '@/services/premium';
 import { accentPresets, useTheme, withAlpha, type AccentPresetId } from '@/theme';
@@ -111,6 +114,27 @@ export default function CatalogScreen() {
               onPress={() => setAccentPreset(id)}
             />
           ))}
+        </View>
+      </Section>
+
+      <Section title="開発用データ">
+        <View style={[styles.row, { gap: spacing.xs }]}>
+          <Button
+            title="サンプル（カンプ相当）"
+            size="sm"
+            variant="secondary"
+            style={{ flex: 1 }}
+            onPress={() =>
+              replaceRepositoryForDev(new InMemorySubscriptionRepository(buildSampleData()))
+            }
+          />
+          <Button
+            title="0件にする"
+            size="sm"
+            variant="secondary"
+            style={{ flex: 1 }}
+            onPress={() => replaceRepositoryForDev(new InMemorySubscriptionRepository())}
+          />
         </View>
       </Section>
 

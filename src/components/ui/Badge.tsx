@@ -4,7 +4,7 @@ import { useTheme } from '@/theme';
 
 import { AppText } from './AppText';
 
-export type BadgeTone = 'negative' | 'warning' | 'positive' | 'info';
+export type BadgeTone = 'negative' | 'warning' | 'positive' | 'info' | 'neutral';
 
 type Props = {
   label: string;
@@ -20,6 +20,7 @@ export function Badge({ label, tone = 'info', style }: Props) {
     warning: [colors.warningSoft, colors.warning],
     positive: [colors.positiveSoft, colors.positive],
     info: [colors.infoSoft, colors.info],
+    neutral: [colors.surfaceSecondary, colors.textSecondary],
   } as const;
   const [background, foreground] = map[tone];
 

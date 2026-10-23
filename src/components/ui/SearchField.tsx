@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -17,9 +18,18 @@ type Props = {
   placeholder: string;
   style?: StyleProp<ViewStyle>;
   autoFocus?: boolean;
+  /** 右端に置く小さなボタン（一覧の並び替えなど） */
+  trailing?: ReactNode;
 };
 
-export function SearchField({ value, onChangeText, placeholder, style, autoFocus }: Props) {
+export function SearchField({
+  value,
+  onChangeText,
+  placeholder,
+  style,
+  autoFocus,
+  trailing,
+}: Props) {
   const { colors, radius, spacing, typography } = useTheme();
   return (
     <View
@@ -62,6 +72,7 @@ export function SearchField({ value, onChangeText, placeholder, style, autoFocus
           />
         </Pressable>
       ) : null}
+      {trailing}
     </View>
   );
 }

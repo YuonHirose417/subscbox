@@ -51,9 +51,9 @@ export function Screen({
         <LinearGradient
           pointerEvents="none"
           colors={colors.backgroundTint}
-          locations={[0, 0.45, 1]}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0.3, y: 1 }}
+          locations={[0, 0.5, 1]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
           style={styles.tint}
         />
       ) : null}
@@ -74,5 +74,5 @@ export function Screen({
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  tint: { position: 'absolute', top: 0, left: 0, right: 0, height: 360 },
+  tint: { position: 'absolute', top: 0, left: 0, right: 0, height: 420 },
 });
