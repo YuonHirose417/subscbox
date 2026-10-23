@@ -114,8 +114,12 @@ export default function HomeScreen() {
                 </AppText>
               </View>
               {summary.missingRateCurrencies.length > 0 ? (
-                <AppText variant="caption" style={{ color: colors.warning }}>
-                  レート未設定の外貨があります（{summary.missingRateCurrencies.join('・')}）
+                <AppText
+                  variant="caption"
+                  accessibilityRole="link"
+                  onPress={() => router.push('/settings/currency')}
+                  style={{ color: colors.warning }}>
+                  レート未設定の外貨があります（{summary.missingRateCurrencies.join('・')}）›
                 </AppText>
               ) : null}
             </View>

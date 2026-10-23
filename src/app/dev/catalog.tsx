@@ -20,6 +20,8 @@ import {
   Skeleton,
   Toggle,
 } from '@/components/ui';
+import { BarChart } from '@/components/charts/BarChart';
+import { DonutChart } from '@/components/charts/DonutChart';
 import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore, type ThemePreference } from '@/features/settings/store';
 import { renewalBadgeTone } from '@/features/subscriptions/renewalBadge';
@@ -288,6 +290,34 @@ export default function CatalogScreen() {
         </Card>
         <Card>
           <SectionHeader title="月別の支出推移" trailing="平均 ¥11,200" />
+        </Card>
+      </Section>
+
+      <Section title="グラフ">
+        <Card>
+          <BarChart
+            bars={[
+              { key: '4', label: '4月', value: 9800 },
+              { key: '5', label: '5月', value: 9200 },
+              { key: '6', label: '6月', value: 10400 },
+              { key: '7', label: '7月', value: 10400 },
+              { key: '8', label: '8月', value: 11200 },
+              { key: '9', label: '9月', value: 11600 },
+              { key: '10', label: '10月', value: 12340 },
+            ]}
+            highlightIndex={6}
+            formatValue={(v) => `¥${v.toLocaleString('ja-JP')}`}
+          />
+        </Card>
+        <Card style={{ alignItems: 'center' }}>
+          <DonutChart
+            segments={Object.entries(categoryColors).map(([key, color], i) => ({
+              label: key,
+              color,
+              value: 6 - i,
+            }))}
+            size={150}
+          />
         </Card>
       </Section>
 

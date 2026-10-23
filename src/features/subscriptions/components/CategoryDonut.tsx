@@ -16,6 +16,8 @@ type Props = {
   /** 中央の見出し（既定「合計」） */
   centerLabel?: string;
   size?: number;
+  /** 中央の金額の下に「/月」等を出すか */
+  showSuffix?: boolean;
 };
 
 const PERIOD_SUFFIX: Record<Period, string> = { month: '/月', year: '/年', all: '累計' };
@@ -27,6 +29,7 @@ export function CategoryDonut({
   legendValue = 'amount',
   centerLabel = '合計',
   size = 150,
+  showSuffix = true,
 }: Props) {
   const { spacing, colors } = useTheme();
   const segments = breakdown.segments.map((s) => ({
@@ -66,7 +69,7 @@ export function CategoryDonut({
               numberOfLines={1}
               style={[styles.centerValue, { maxWidth: size * 0.62 }]}
             />
-            {period !== 'all' ? (
+            {showSuffix && period !== 'all' ? (
               <AppText variant="footnote" tone="secondary">
                 {PERIOD_SUFFIX[period]}
               </AppText>

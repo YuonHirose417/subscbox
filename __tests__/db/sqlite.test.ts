@@ -1,6 +1,7 @@
 import { LATEST_VERSION, migrate } from '@/db/migrations';
 import { CategoryRepository } from '@/db/repositories/CategoryRepository';
 import { PaymentMethodRepository } from '@/db/repositories/PaymentMethodRepository';
+import { PaymentRepository } from '@/db/repositories/PaymentRepository';
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { SqliteSubscriptionRepository } from '@/db/repositories/SqliteSubscriptionRepository';
 import { toInput } from '@/domain/subscription';
@@ -97,5 +98,45 @@ run('SqliteSubscriptionRepository transactions', () => {
     ).rejects.toMatchObject({ code: 'DB_WRITE' });
     expect(await db.all('SELECT * FROM price_history')).toHaveLength(0);
     expect(await subs.list()).toHaveLength(0);
+  });
+});
+
+run('PaymentRepository', () => {
+  it('syncs, edits and deletes payment history', async () => {
+    const { db, subs } = await setup();
+    let n = 0;
+    const payments = new PaymentRepository(db, () => `pay-${(n += 1)}`);
+    const sub = await subs.create(
+      toInput(
+        makeSub({ startDate: '2025-08-10', nextRenewalDate: '2025-11-10', amountMinor: 980 }),
+      ),
+    );
+    const history = await subs.getPriceHistory();
+    expect(await payments.sync([sub], history, '2025-10-17')).toEqual({ inserted: 3, deleted: 0 });
+    expect(await payments.sync([sub], history, '2025-10-17')).toEqual({ inserted: 0, deleted: 0 });
+
+    const [latest] = await payments.listAll();
+    expect(latest.billedOn).toBe('2025-10-10');
+    await payments.edit(latest.id, { amountMinor: 1080 });
+    await payments.edit(latest.id, { billedOn: '2025-10-11' });
+    await expect(payments.edit(latest.id, { amountMinor: 0 })).rejects.toMatchObject({
+      code: 'VALIDATION',
+    });
+
+    const all = await payments.listAll();
+    expect(all.find((p) => p.billedOn === '2025-10-11')).toMatchObject({
+      amountMinor: 1080,
+      isUserEdited: true,
+      status: 'paid',
+    });
+    expect(all.find((p) => p.billedOn === '2025-10-10')?.status).toBe('skipped');
+    // 移動・削除した日は再生成されない
+    const sept = all.find((p) => p.billedOn === '2025-09-10')!;
+    await payments.remove(sept.id);
+    expect(await payments.sync([sub], history, '2025-10-17')).toEqual({ inserted: 0, deleted: 0 });
+
+    // サブスクを削除すると履歴も消える
+    await subs.remove(sub.id);
+    expect(await payments.listAll()).toHaveLength(0);
   });
 });

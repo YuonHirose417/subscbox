@@ -16,7 +16,12 @@ export default function SettingsScreen() {
       <ScreenHeader showBack title={ja.screens.settings.title} />
       <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
         <ListRow icon="bell" title={t.notifications} onPress={() => {}} separator />
-        <ListRow icon="icloud" title={t.backup} onPress={() => {}} separator />
+        <ListRow
+          icon="icloud"
+          title={t.backup}
+          onPress={() => router.push('/settings/data')}
+          separator
+        />
         <ListRow
           icon="moon"
           title={t.theme}

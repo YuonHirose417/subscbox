@@ -323,6 +323,33 @@ function Detail({ sub }: { sub: Subscription }) {
               }}
             />
           </Card>
+          {/* カンプにない追加要素：支払い履歴（プレミアム） */}
+          <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+            <ListRow
+              icon="clock.arrow.circlepath"
+              iconBackground={withAlpha(accent.tertiary, 0.14)}
+              iconColor={accent.tertiary}
+              title="支払い履歴"
+              trailing={
+                isPremium ? null : (
+                  <Icon
+                    name="lock.fill"
+                    fallback="lock-closed"
+                    size={12}
+                    color={colors.textTertiary}
+                  />
+                )
+              }
+              onPress={() =>
+                isPremium
+                  ? router.push({ pathname: '/subscription/[id]/payments', params: { id: sub.id } })
+                  : Alert.alert(
+                      'プレミアムプランの機能です',
+                      '過去の支払い履歴の確認・修正は、プレミアムプランで利用できます。',
+                    )
+              }
+            />
+          </Card>
           {cancelled ? (
             <AppText variant="caption" tone="tertiary" style={styles.center}>
               このサブスクは解約済みです。右上の「…」から契約中に戻せます。

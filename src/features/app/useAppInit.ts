@@ -4,6 +4,7 @@ import { AppState } from 'react-native';
 import { initRepositories } from '@/db';
 import { setCategoryRepository, useCategoryStore } from '@/features/categories/store';
 import { setPaymentMethodRepository, usePaymentMethodStore } from '@/features/paymentMethods/store';
+import { startPaymentSync } from '@/features/payments/store';
 import { hydrateSettings } from '@/features/settings/store';
 import { setSubscriptionRepository, useSubscriptionStore } from '@/features/subscriptions/store';
 import { logger } from '@/utils/logger';
@@ -12,7 +13,7 @@ export type InitStatus = 'loading' | 'ready' | 'error';
 
 /**
  * 起動処理：DB を開く（マイグレーション）→ 設定・カテゴリ・支払い方法を読み込む →
- * 次回更新日の繰り越し → サブスクを読み込む。フォアグラウンド復帰時は繰り越しと再読み込み。
+ * 次回更新日の繰り越し → サブスクを読み込む → 支払い履歴を同期する。フォアグラウンド復帰時は繰り越しと再読み込み。
  */
 export function useAppInit(): { status: InitStatus; retry: () => void } {
   const [status, setStatus] = useState<InitStatus>('loading');
@@ -32,6 +33,7 @@ export function useAppInit(): { status: InitStatus; retry: () => void } {
           usePaymentMethodStore.getState().load(),
         ]);
         await useSubscriptionStore.getState().load();
+        await startPaymentSync(repos.payments);
         if (!cancelled) setStatus('ready');
       } catch (error) {
         logger.error('app init failed', error);

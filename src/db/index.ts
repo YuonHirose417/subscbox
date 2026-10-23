@@ -3,6 +3,7 @@ import { randomUUID } from 'expo-crypto';
 import { getDb } from './client';
 import { CategoryRepository } from './repositories/CategoryRepository';
 import { PaymentMethodRepository } from './repositories/PaymentMethodRepository';
+import { PaymentRepository } from './repositories/PaymentRepository';
 import { SettingsRepository } from './repositories/SettingsRepository';
 import { SqliteSubscriptionRepository } from './repositories/SqliteSubscriptionRepository';
 
@@ -10,6 +11,7 @@ export type Repositories = {
   subscriptions: SqliteSubscriptionRepository;
   categories: CategoryRepository;
   paymentMethods: PaymentMethodRepository;
+  payments: PaymentRepository;
   settings: SettingsRepository;
 };
 
@@ -24,6 +26,7 @@ export async function initRepositories(): Promise<Repositories> {
     subscriptions: new SqliteSubscriptionRepository(db, { generateId }),
     categories: new CategoryRepository(db, generateId),
     paymentMethods: new PaymentMethodRepository(db, generateId),
+    payments: new PaymentRepository(db, generateId),
     settings: new SettingsRepository(db),
   };
   return repositories;
