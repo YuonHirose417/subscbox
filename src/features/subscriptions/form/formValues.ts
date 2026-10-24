@@ -25,6 +25,8 @@ export type FormValues = {
   categoryId: string;
   /** カスタム時の頭文字アイコンの色（null ならカテゴリ色） */
   iconColor: string | null;
+  /** カスタムアイコン画像（プレミアム）の相対パス */
+  iconImage: string | null;
   paymentMethodId: string | null;
   url: string;
   memo: string;
@@ -66,6 +68,7 @@ export function valuesFromPreset(
     renewalEdited: false,
     categoryId: preset.categoryId,
     iconColor: null,
+    iconImage: null,
     paymentMethodId: null,
     url: preset.url ?? '',
     memo: '',
@@ -94,6 +97,7 @@ export function valuesForCustom(
     renewalEdited: false,
     categoryId,
     iconColor: null,
+    iconImage: null,
     paymentMethodId: null,
     url: '',
     memo: '',
@@ -116,6 +120,7 @@ export function valuesFromSubscription(sub: Subscription): FormValues {
     renewalEdited: true,
     categoryId: sub.categoryId,
     iconColor: sub.serviceKey ? null : sub.icon.color,
+    iconImage: sub.icon.type === 'image' ? sub.icon.value : null,
     paymentMethodId: sub.paymentMethodId,
     url: sub.url ?? '',
     memo: sub.memo ?? '',
@@ -141,7 +146,9 @@ export function toSubmission(
     startDate: values.startDate,
     nextRenewalDate: values.nextRenewalDate,
     categoryId: values.categoryId,
-    icon: { type: 'monogram', value: null, color: values.iconColor ?? brandColor },
+    icon: values.iconImage
+      ? { type: 'image', value: values.iconImage, color: values.iconColor ?? brandColor }
+      : { type: 'monogram', value: null, color: values.iconColor ?? brandColor },
     paymentMethodId: values.paymentMethodId,
     url: values.url.trim() || null,
     memo: values.memo.trim() || null,

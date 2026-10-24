@@ -87,4 +87,20 @@ describe('form values', () => {
       url: 'https://hulu.jp',
     });
   });
+
+  it('keeps a custom icon image and drops it when removed', () => {
+    const sub = makeSub({ icon: { type: 'image', value: 'icons/a.jpg', color: null } });
+    const v = valuesFromSubscription(sub);
+    expect(v.iconImage).toBe('icons/a.jpg');
+    expect(toSubmission(v, null).input.icon).toEqual({
+      type: 'image',
+      value: 'icons/a.jpg',
+      color: null,
+    });
+    expect(toSubmission({ ...v, iconImage: null }, '#000000').input.icon).toEqual({
+      type: 'monogram',
+      value: null,
+      color: '#000000',
+    });
+  });
 });

@@ -44,7 +44,7 @@ export function Button({
     variant === 'secondary'
       ? colors.textPrimary
       : variant === 'destructive'
-        ? colors.negative
+        ? colors.negativeText
         : colors.onAccent;
   const flatBackground =
     variant === 'secondary'

@@ -27,9 +27,11 @@ import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore, type ThemePreference } from '@/features/settings/store';
 import { renewalBadgeTone } from '@/features/subscriptions/renewalBadge';
 import { useSubscriptionStore } from '@/features/subscriptions/store';
-import { clearSubscriptionsForDev, seedSampleDataForDev } from '@/db/devTools';
+import { clearSubscriptionsForDev, seedManyForDev, seedSampleDataForDev } from '@/db/devTools';
+import { today as todayString } from '@/domain/dates';
 import { ja } from '@/i18n/ja';
 import { premiumService } from '@/services/premium';
+import { setDevDayOffset, useClockStore } from '@/utils/clock';
 import { accentPresets, useTheme, withAlpha, type AccentPresetId } from '@/theme';
 import type { TypographyVariant } from '@/theme/typography';
 
@@ -76,6 +78,7 @@ export default function CatalogScreen() {
   const accentPreset = useSettingsStore((s) => s.accentPreset);
   const setAccentPreset = useSettingsStore((s) => s.setAccentPreset);
   const { isPremium } = usePremium();
+  const offsetDays = useClockStore((s) => s.offsetDays);
 
   const [period, setPeriod] = useState<'month' | 'year' | 'all'>('month');
   const [chip, setChip] = useState(CHIPS[0]);
@@ -139,6 +142,36 @@ export default function CatalogScreen() {
               clearSubscriptionsForDev().then(() => useSubscriptionStore.getState().load())
             }
           />
+        </View>
+        <View style={[styles.row, { gap: spacing.xs }]}>
+          <Button
+            title="ダミー100件を追加"
+            size="sm"
+            variant="secondary"
+            style={{ flex: 1 }}
+            onPress={() => seedManyForDev(100).then(() => useSubscriptionStore.getState().load())}
+          />
+        </View>
+      </Section>
+
+      <Section title="日付の偽装（開発用）">
+        <AppText variant="footnote" tone="secondary">
+          今日：{todayString()}（{offsetDays >= 0 ? '+' : ''}
+          {offsetDays}
+          日）。次回更新日の繰り越し・通知・支払い履歴の計算を確認できます。繰り越しはDBに保存されるので、サンプルデータで試してください。
+        </AppText>
+        <View style={[styles.wrap, { gap: spacing.xs }]}>
+          {[0, 1, 7, 30, 90].map((days) => (
+            <Chip
+              key={days}
+              label={days === 0 ? '実際の今日' : `+${days}日`}
+              selected={offsetDays === days}
+              onPress={() => {
+                setDevDayOffset(days);
+                void useSubscriptionStore.getState().load();
+              }}
+            />
+          ))}
         </View>
       </Section>
 

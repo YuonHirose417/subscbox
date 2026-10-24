@@ -17,6 +17,7 @@ import {
 } from '@/components/ui';
 import { compareDate, formatMonthDay } from '@/domain/dates';
 import { formatMinor, formatMoney } from '@/domain/money';
+import { reviewCandidates } from '@/domain/review';
 import type { TrendPoint } from '@/domain/trend';
 import type { Period } from '@/domain/types';
 import { BreakdownSheet } from '@/features/analytics/components/BreakdownSheet';
@@ -24,6 +25,8 @@ import { useAnalytics } from '@/features/analytics/hooks/useAnalytics';
 import { usePremium } from '@/features/premium/usePremium';
 import { CategoryDonut } from '@/features/subscriptions/components/CategoryDonut';
 import { ServiceIcon } from '@/features/subscriptions/components/ServiceIcon';
+import { useToday } from '@/features/subscriptions/hooks/useToday';
+import { useSubscriptionStore } from '@/features/subscriptions/store';
 import { ja } from '@/i18n/ja';
 import { useTheme } from '@/theme';
 
@@ -42,6 +45,11 @@ export default function AnalyticsScreen() {
   const [categoryPeriod, setCategoryPeriod] = useState<Period>('year');
   const [selected, setSelected] = useState<TrendPoint | null>(null);
   const a = useAnalytics(period, categoryPeriod);
+  const today = useToday();
+  const reviewCount = reviewCandidates(
+    useSubscriptionStore((s) => s.items),
+    today,
+  ).length;
 
   const trendTitle = a.trend[0]?.key.length === 4 ? '年別の支出推移' : '月別の支出推移';
   const billsTotal = a.bills.reduce((s, e) => s + (e.amountJpy ?? 0), 0);
@@ -184,6 +192,13 @@ export default function AnalyticsScreen() {
       </Card>
 
       <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+        <ListRow
+          icon="hourglass"
+          title="使っていない可能性のあるサブスク"
+          value={reviewCount > 0 ? `${reviewCount}件` : undefined}
+          separator
+          onPress={() => router.push('/review')}
+        />
         <ListRow
           icon="calendar"
           title="支払いカレンダー"

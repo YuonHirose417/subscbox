@@ -11,6 +11,7 @@ import {
   replaceScheduled,
   type PermissionState,
 } from '@/services/notifications';
+import { currentTime } from '@/utils/clock';
 import { logger } from '@/utils/logger';
 
 type NotificationSyncState = {
@@ -50,7 +51,7 @@ export async function rescheduleNotifications(): Promise<void> {
                 subscriptions: items,
                 defaults: useSettingsStore.getState().notificationDefaults,
                 isPremium: usePremiumStore.getState().isPremium,
-                now: new Date(),
+                now: currentTime(),
               })
             : [];
         const scheduled = plans.length > 0 ? await replaceScheduled(plans) : [];

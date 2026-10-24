@@ -8,6 +8,9 @@ import Animated, {
 
 import { motion } from '@/theme';
 
+// style（幅の % 指定・flex など）を Pressable 自体に当てるため、Pressable をアニメーション対応にする
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 type Props = Omit<PressableProps, 'style'> & {
   style?: StyleProp<ViewStyle>;
   /** 押下時の縮小率（既定 0.97） */
@@ -29,9 +32,10 @@ export function PressableScale({
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
 
   return (
-    <Pressable
+    <AnimatedPressable
       {...props}
       disabled={disabled}
+      style={[style, animatedStyle]}
       onPressIn={(e) => {
         if (!reducedMotion) scale.set(withSpring(scaleTo, motion.spring));
         onPressIn?.(e);
@@ -40,11 +44,7 @@ export function PressableScale({
         if (!reducedMotion) scale.set(withSpring(1, motion.spring));
         onPressOut?.(e);
       }}>
-      {(state) => (
-        <Animated.View style={[style, animatedStyle]}>
-          {typeof children === 'function' ? children(state) : children}
-        </Animated.View>
-      )}
-    </Pressable>
+      {children}
+    </AnimatedPressable>
   );
 }

@@ -39,6 +39,7 @@ import {
   timeToDate,
 } from '../components/NotificationSettingSheet';
 import { ServiceIcon } from '../components/ServiceIcon';
+import { pickIconImage } from '../iconImages';
 import { CategoryPickerSheet } from './CategoryPickerSheet';
 import { ColorChoices } from './ColorChoices';
 import { suggestNextRenewal, toSubmission, type FormField, type FormValues } from './formValues';
@@ -131,6 +132,35 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
       `無料版では、すべてのサブスクに通知の全体設定（${notifyDaysLabel(notificationDefaults.daysBefore)} ${notificationDefaults.time}）が適用されます。サブスクごとの設定はプレミアムプランで利用できます。`,
     );
 
+  const pickImage = async () => {
+    try {
+      const path = await pickIconImage();
+      if (path) update({ iconImage: path });
+    } catch (error) {
+      logger.error('failed to pick icon image', error);
+      Alert.alert('画像を読み込めませんでした', 'もう一度お試しください');
+    }
+  };
+
+  const chooseIconImage = () => {
+    if (!isPremium) {
+      Alert.alert(
+        'プレミアムプランの機能です',
+        'アイコンに好きな画像を設定できるのは、プレミアムプランの機能です。',
+      );
+      return;
+    }
+    if (!values.iconImage) {
+      void pickImage();
+      return;
+    }
+    Alert.alert('アイコンの画像', undefined, [
+      { text: '別の写真を選ぶ', onPress: () => void pickImage() },
+      { text: '画像を外す', style: 'destructive', onPress: () => update({ iconImage: null }) },
+      { text: 'キャンセル', style: 'cancel' },
+    ]);
+  };
+
   const cardStyle = { paddingHorizontal: spacing.md };
 
   return (
@@ -143,7 +173,9 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
               serviceKey: values.serviceKey,
               name: values.name || '?',
               categoryId: values.categoryId,
-              icon: { type: 'monogram', value: null, color: values.iconColor },
+              icon: values.iconImage
+                ? { type: 'image', value: values.iconImage, color: values.iconColor }
+                : { type: 'monogram', value: null, color: values.iconColor },
             }}
           />
           <View style={styles.flex}>
@@ -163,12 +195,29 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
           </View>
         </View>
         {errorOf('name') ? (
-          <AppText variant="caption" style={{ color: colors.negative, paddingBottom: spacing.xs }}>
+          <AppText
+            variant="caption"
+            style={{ color: colors.negativeText, paddingBottom: spacing.xs }}>
             {errorOf('name')}
           </AppText>
         ) : null}
         <View style={[styles.hairline, { backgroundColor: colors.hairline }]} />
-        {isCustom ? (
+        <FormRow
+          label="アイコンの画像"
+          separator
+          showChevron
+          onPress={chooseIconImage}
+          accessibilityLabel={`アイコンの画像、${values.iconImage ? '設定済み' : '未設定'}${isPremium ? '' : '、プレミアム'}`}>
+          <View style={[styles.inlineRow, { gap: spacing.xs }]}>
+            <AppText variant="body" tone="secondary">
+              {values.iconImage ? '設定済み' : '写真を選ぶ'}
+            </AppText>
+            {isPremium ? null : (
+              <Icon name="lock.fill" fallback="lock-closed" size={12} color={colors.textTertiary} />
+            )}
+          </View>
+        </FormRow>
+        {isCustom && !values.iconImage ? (
           <FormRow label="アイコンの色" stacked separator>
             <ColorChoices
               value={values.iconColor ?? category?.color ?? null}
@@ -514,6 +563,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   stepper: { flexDirection: 'row', alignItems: 'center' },
+  inlineRow: { flexDirection: 'row', alignItems: 'center' },
   interval: { minWidth: 72, textAlign: 'center' },
   wrap: { flexDirection: 'row', flexWrap: 'wrap' },
   locked: { flexDirection: 'row', alignItems: 'center' },

@@ -70,7 +70,7 @@ export function ListRow({
       <AppText
         variant="body"
         numberOfLines={1}
-        style={[styles.title, destructive ? { color: colors.negative } : null]}>
+        style={[styles.title, destructive ? { color: colors.negativeText } : null]}>
         {title}
       </AppText>
       {value ? (

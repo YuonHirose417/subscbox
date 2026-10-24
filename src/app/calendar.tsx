@@ -182,7 +182,10 @@ export default function CalendarScreen() {
               variant="caption"
               style={[
                 styles.cellText,
-                { color: i === 0 ? colors.negative : i === 6 ? colors.info : colors.textTertiary },
+                {
+                  color:
+                    i === 0 ? colors.negativeText : i === 6 ? colors.infoText : colors.textTertiary,
+                },
               ]}>
               {w}
             </AppText>
@@ -215,7 +218,7 @@ export default function CalendarScreen() {
                       color: isSelected
                         ? colors.onAccent
                         : isToday
-                          ? accent.primary
+                          ? accent.text
                           : colors.textPrimary,
                       fontWeight: isToday || isSelected ? '700' : '400',
                     }}>

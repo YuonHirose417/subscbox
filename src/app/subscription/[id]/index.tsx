@@ -16,7 +16,13 @@ import {
   type IconName,
 } from '@/components/ui';
 import { cycleSuffix, daysUntil, monthlyEquivalent } from '@/domain/billing';
-import { dateOfDateTime, formatDaysLeft, formatFullDate } from '@/domain/dates';
+import {
+  dateOfDateTime,
+  diffDays,
+  formatDaysLeft,
+  formatFullDate,
+  formatMonthDay,
+} from '@/domain/dates';
 import { formatMinor, formatMoney, fromMinor } from '@/domain/money';
 import { effectiveNotification } from '@/domain/notifications';
 import { formatPaymentMethod } from '@/domain/paymentMethod';
@@ -32,6 +38,7 @@ import { usePaymentMethodStore } from '@/features/paymentMethods/store';
 import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore } from '@/features/settings/store';
 import { DetailHeader } from '@/features/subscriptions/components/DetailHeader';
+import { LastUsedSheet } from '@/features/subscriptions/components/LastUsedSheet';
 import {
   NotificationSettingSheet,
   notifyDaysLabel,
@@ -51,6 +58,11 @@ function priceLabel(cycle: BillingCycle): string {
   if (cycle.interval === 1)
     return { week: '週額料金', month: '月額料金', year: '年額料金' }[cycle.unit];
   return `料金（${cycleSuffix(cycle).slice(1)}ごと）`;
+}
+
+function lastUsedAgo(date: string, today: string): string {
+  const days = diffDays(date, today);
+  return days === 0 ? '今日' : `${days}日前`;
 }
 
 export default function SubscriptionDetailScreen() {
@@ -84,7 +96,9 @@ function Detail({ sub }: { sub: Subscription }) {
   const notificationDefaults = useSettingsStore((s) => s.notificationDefaults);
   const { isPremium } = usePremium();
   const store = useSubscriptionStore.getState;
-  const [sheet, setSheet] = useState<'category' | 'payment' | 'notification' | null>(null);
+  const [sheet, setSheet] = useState<'category' | 'payment' | 'notification' | 'lastUsed' | null>(
+    null,
+  );
 
   const category = categories.find((c) => c.id === sub.categoryId);
   const paymentMethod = paymentMethods.find((m) => m.id === sub.paymentMethodId);
@@ -92,10 +106,10 @@ function Detail({ sub }: { sub: Subscription }) {
   const daysLeft = daysUntil(sub.nextRenewalDate, today);
   const tone = renewalBadgeTone(daysLeft);
   const renewalColor = {
-    negative: colors.negative,
-    positive: colors.positive,
-    info: colors.info,
-    warning: colors.warning,
+    negative: colors.negativeText,
+    positive: colors.positiveText,
+    info: colors.infoText,
+    warning: colors.warningText,
     neutral: colors.textSecondary,
   }[tone];
   // 無料版は全体設定に従う（サブスクごとの通知設定はプレミアム）。全体設定のオフはすべてに優先する
@@ -347,8 +361,21 @@ function Detail({ sub }: { sub: Subscription }) {
               }}
             />
           </Card>
-          {/* カンプにない追加要素：支払い履歴（プレミアム） */}
+          {/* カンプにない追加要素：最終利用日（見直し候補用）・支払い履歴（プレミアム） */}
           <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+            <ListRow
+              icon="hourglass"
+              iconBackground={withAlpha(colors.warning, 0.14)}
+              iconColor={colors.warning}
+              title="最終利用日"
+              value={
+                sub.lastUsedDate
+                  ? `${formatMonthDay(sub.lastUsedDate)}（${lastUsedAgo(sub.lastUsedDate, today)}）`
+                  : '未記録'
+              }
+              separator
+              onPress={() => setSheet('lastUsed')}
+            />
             <ListRow
               icon="clock.arrow.circlepath"
               iconBackground={withAlpha(accent.tertiary, 0.14)}
@@ -392,6 +419,13 @@ function Detail({ sub }: { sub: Subscription }) {
         visible={sheet === 'payment'}
         value={sub.paymentMethodId}
         onSelect={(paymentMethodId) => save({ paymentMethodId })}
+        onClose={() => setSheet(null)}
+      />
+      <LastUsedSheet
+        visible={sheet === 'lastUsed'}
+        value={sub.lastUsedDate}
+        today={today}
+        onSave={(lastUsedDate) => save({ lastUsedDate })}
         onClose={() => setSheet(null)}
       />
       <NotificationSettingSheet

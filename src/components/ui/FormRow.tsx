@@ -70,7 +70,7 @@ export function FormRow({
       {error ? (
         <AppText
           variant="caption"
-          style={{ color: colors.negative }}
+          style={{ color: colors.negativeText }}
           accessibilityLiveRegion="polite">
           {error}
         </AppText>

@@ -9,6 +9,8 @@ import {
   startOfMonth as startOfMonthFn,
 } from 'date-fns';
 
+import { currentTime } from '@/utils/clock';
+
 import type { BillingCycle, DateString } from './types';
 
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -38,7 +40,7 @@ export function toDateString(date: Date): DateString {
   return format(date, 'yyyy-MM-dd');
 }
 
-export function today(now: Date = new Date()): DateString {
+export function today(now: Date = currentTime()): DateString {
   return toDateString(now);
 }
 

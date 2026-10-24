@@ -8,14 +8,16 @@ import type { Subscription } from '@/domain/types';
 import { useCategories } from '@/features/categories/store';
 import { useTheme } from '@/theme';
 
+import { iconImageUri } from '../iconImages';
+
 type Props = {
   subscription: Pick<Subscription, 'serviceKey' | 'name' | 'icon' | 'categoryId'>;
   size?: number;
 };
 
 /**
- * サービスのアイコン。assets/service-logos/<serviceKey>.png があればロゴ、
- * なければブランドカラー（カスタムはカテゴリカラー）＋白の頭文字。
+ * サービスのアイコン。カスタム画像（プレミアム）→ assets/service-logos/<serviceKey>.png のロゴ →
+ * ブランドカラー（カスタムはカテゴリカラー）＋白の頭文字、の順に使う。
  */
 export function ServiceIcon({ subscription, size }: Props) {
   const { sizes, radius, colors, shadow } = useTheme();
@@ -30,6 +32,21 @@ export function ServiceIcon({ subscription, size }: Props) {
     borderRadius: corner,
     borderCurve: 'continuous' as const,
   };
+
+  // カスタム画像（プレミアム）。ファイルが無い場合（バックアップから復元した等）はロゴ・頭文字にする
+  const imageUri = icon.type === 'image' ? iconImageUri(icon.value) : null;
+  if (imageUri) {
+    return (
+      <View style={[styles.frame, frame, { borderColor: colors.border }]}>
+        <Image
+          source={{ uri: imageUri }}
+          style={frame}
+          contentFit="cover"
+          accessibilityIgnoresInvertColors
+        />
+      </View>
+    );
+  }
 
   if (logo) {
     return (

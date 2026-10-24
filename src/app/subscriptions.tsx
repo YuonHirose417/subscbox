@@ -177,5 +177,5 @@ export default function SubscriptionsScreen() {
 
 const styles = StyleSheet.create({
   sortButton: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
-  chips: { flexGrow: 0 },
+  chips: { flexGrow: 0, flexShrink: 0 },
 });

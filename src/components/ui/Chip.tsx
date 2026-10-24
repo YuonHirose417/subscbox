@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet } from 'react-native';
 
@@ -20,7 +21,10 @@ export function Chip({ label, selected = false, onPress }: Props) {
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ selected }}
-      onPress={onPress}
+      onPress={() => {
+        if (!selected) Haptics.selectionAsync().catch(() => {});
+        onPress?.();
+      }}
       hitSlop={{ top: 6, bottom: 6 }}
       style={[
         styles.chip,

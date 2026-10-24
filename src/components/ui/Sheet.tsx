@@ -39,7 +39,7 @@ export function Sheet({ visible, title, onClose, children, closeLabel = '完了'
             hitSlop={12}
             onPress={onClose}
             style={[styles.side, styles.close]}>
-            <AppText variant="headline" style={{ color: accent.primary }}>
+            <AppText variant="headline" style={{ color: accent.text }}>
               {closeLabel}
             </AppText>
           </Pressable>

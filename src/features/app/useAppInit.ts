@@ -7,6 +7,7 @@ import { setPaymentMethodRepository, usePaymentMethodStore } from '@/features/pa
 import { startNotificationSync } from '@/features/notifications/sync';
 import { startPaymentSync } from '@/features/payments/store';
 import { hydrateSettings } from '@/features/settings/store';
+import { removeUnusedIconImages } from '@/features/subscriptions/iconImages';
 import { setSubscriptionRepository, useSubscriptionStore } from '@/features/subscriptions/store';
 import { logger } from '@/utils/logger';
 
@@ -35,6 +36,12 @@ export function useAppInit(): { status: InitStatus; retry: () => void } {
           usePaymentMethodStore.getState().load(),
         ]);
         await useSubscriptionStore.getState().load();
+        // 差し替え・削除で使われなくなったアイコン画像を片付ける
+        {
+          const { status, items } = useSubscriptionStore.getState();
+          // 読み込みに失敗したとき（items が空）に画像を消してしまわないよう、成功時だけ片付ける
+          if (status === 'ready') removeUnusedIconImages(items);
+        }
         await startPaymentSync(repos.payments);
         // 通知の予約は失敗しても起動は続ける（権限の要求はここではしない）
         startNotificationSync(repos.notifications).catch((e) =>

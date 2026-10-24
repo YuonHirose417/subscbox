@@ -50,7 +50,8 @@ export default function HomeScreen() {
   const openAdd = () => router.push('/add');
   const isEmpty = status === 'ready' && summary.activeCount === 0;
   const diff = Math.round(summary.monthOverMonth);
-  const diffColor = diff > 0 ? colors.negative : diff < 0 ? colors.positive : colors.textSecondary;
+  const diffColor =
+    diff > 0 ? colors.negativeText : diff < 0 ? colors.positiveText : colors.textSecondary;
 
   return (
     <View style={styles.root}>
@@ -118,7 +119,7 @@ export default function HomeScreen() {
                   variant="caption"
                   accessibilityRole="link"
                   onPress={() => router.push('/settings/currency')}
-                  style={{ color: colors.warning }}>
+                  style={{ color: colors.warningText }}>
                   レート未設定の外貨があります（{summary.missingRateCurrencies.join('・')}）›
                 </AppText>
               ) : null}

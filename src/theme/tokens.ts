@@ -34,6 +34,11 @@ export type Palette = {
   negativeSoft: string;
   warningSoft: string;
   infoSoft: string;
+  /** 文字として使うときのセマンティック色（ライトは WCAG AA 4.5:1 を満たすよう濃くする） */
+  negativeText: string;
+  positiveText: string;
+  warningText: string;
+  infoText: string;
 };
 
 const light: Palette = {
@@ -44,8 +49,9 @@ const light: Palette = {
   border: 'rgba(15, 23, 42, 0.06)',
   hairline: 'rgba(15, 23, 42, 0.08)',
   textPrimary: '#0F172A',
-  textSecondary: '#64748B',
-  textTertiary: '#94A3B8',
+  // カンプより少し濃くして、背景・カードの上で WCAG AA（4.5:1）を満たす
+  textSecondary: '#56667D',
+  textTertiary: '#5F6E85',
   onAccent: '#FFFFFF',
   fill: 'rgba(15, 23, 42, 0.04)',
   skeletonHighlight: 'rgba(255, 255, 255, 0.7)',
@@ -59,6 +65,10 @@ const light: Palette = {
   negativeSoft: 'rgba(244, 63, 94, 0.10)',
   warningSoft: 'rgba(245, 158, 11, 0.12)',
   infoSoft: 'rgba(79, 123, 255, 0.10)',
+  negativeText: '#CC1439',
+  positiveText: '#047857',
+  warningText: '#B45309',
+  infoText: '#3D63E8',
 };
 
 const dark: Palette = {
@@ -84,6 +94,10 @@ const dark: Palette = {
   negativeSoft: 'rgba(251, 113, 133, 0.16)',
   warningSoft: 'rgba(251, 191, 36, 0.16)',
   infoSoft: 'rgba(115, 151, 255, 0.16)',
+  negativeText: '#FB7185',
+  positiveText: '#34D399',
+  warningText: '#FBBF24',
+  infoText: '#7397FF',
 };
 
 export const palettes: Record<ColorScheme, Palette> = { light, dark };
@@ -104,6 +118,8 @@ export type Accent = {
   gradientMuted: readonly [string, string];
   /** Toggle のトラック等 */
   control: string;
+  /** リンク等の文字色（AA 4.5:1 を満たす濃さ） */
+  text: string;
 };
 
 export type AccentPresetId = 'default' | 'ocean' | 'sakura' | 'mint';
@@ -121,6 +137,7 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       gradientSoft: ['#C4A5FB', '#93C5FD'],
       gradientMuted: ['#C7D6FF', '#DCD4FF'],
       control: '#4F7BFF',
+      text: '#3D63E8',
     },
     dark: {
       primary: '#7397FF',
@@ -130,6 +147,7 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       gradientSoft: ['#9F86E8', '#6FA3E8'],
       gradientMuted: ['#2C3866', '#3A3270'],
       control: '#6E8FFF',
+      text: '#7397FF',
     },
   },
   ocean: {
@@ -142,6 +160,7 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       gradientSoft: ['#A5E3FB', '#A5C8FD'],
       gradientMuted: ['#C5E9FA', '#CFE0FD'],
       control: '#0EA5E9',
+      text: '#0369A1',
     },
     dark: {
       primary: '#38BDF8',
@@ -151,6 +170,7 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       gradientSoft: ['#4C9AC2', '#5B86C9'],
       gradientMuted: ['#173A52', '#1E335C'],
       control: '#38BDF8',
+      text: '#38BDF8',
     },
   },
   sakura: {
@@ -163,6 +183,7 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       gradientSoft: ['#F9B8D9', '#D6B4FB'],
       gradientMuted: ['#FBD3E7', '#E6D3FC'],
       control: '#EC4899',
+      text: '#BE185D',
     },
     dark: {
       primary: '#F472B6',
@@ -172,6 +193,7 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       gradientSoft: ['#B66A93', '#9670C2'],
       gradientMuted: ['#4A2038', '#3B2552'],
       control: '#F472B6',
+      text: '#F472B6',
     },
   },
   mint: {
@@ -184,6 +206,7 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       gradientSoft: ['#A7EBD3', '#A5E4EE'],
       gradientMuted: ['#C9F2E3', '#C8EEF2'],
       control: '#10B981',
+      text: '#047857',
     },
     dark: {
       primary: '#34D399',
@@ -193,6 +216,7 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       gradientSoft: ['#3E9C7C', '#3A9BA6'],
       gradientMuted: ['#173F33', '#163E40'],
       control: '#34D399',
+      text: '#34D399',
     },
   },
 };

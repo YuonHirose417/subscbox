@@ -11,6 +11,7 @@ import { rescheduleNotifications } from '@/features/notifications/sync';
 import { usePaymentMethodStore } from '@/features/paymentMethods/store';
 import { usePaymentStore } from '@/features/payments/store';
 import { hydrateSettings, useSettingsStore } from '@/features/settings/store';
+import { removeUnusedIconImages } from '@/features/subscriptions/iconImages';
 import { useSubscriptionStore } from '@/features/subscriptions/store';
 import { cancelAllScheduled } from '@/services/notifications';
 
@@ -101,6 +102,11 @@ async function reloadAll(): Promise<void> {
   await hydrateSettings(repos.settings);
   await Promise.all([useCategoryStore.getState().load(), usePaymentMethodStore.getState().load()]);
   await useSubscriptionStore.getState().load();
+  {
+    const { status, items } = useSubscriptionStore.getState();
+    // 読み込みに失敗したとき（items が空）に画像を消してしまわないよう、成功時だけ片付ける
+    if (status === 'ready') removeUnusedIconImages(items);
+  }
   await usePaymentStore.getState().load();
   await rescheduleNotifications();
 }

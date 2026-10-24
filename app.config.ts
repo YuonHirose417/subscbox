@@ -35,6 +35,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-router',
     // ローカル通知のみ使う（プッシュ通知は使わないので APNs の entitlement を付けない）
     ['expo-notifications', { enableRemoteNotifications: false }],
+    // アイコン画像（プレミアム）の選択。写真ライブラリからの選択のみでカメラ・マイクは使わない
+    [
+      'expo-image-picker',
+      {
+        photosPermission:
+          'サブスクのアイコンに使う写真を選ぶために、写真ライブラリにアクセスします。',
+        cameraPermission: false,
+        microphonePermission: false,
+      },
+    ],
     [
       'expo-splash-screen',
       {

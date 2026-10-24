@@ -17,9 +17,9 @@ export function AppText({ variant = 'body', tone = 'primary', style, ...props }:
     secondary: colors.textSecondary,
     tertiary: colors.textTertiary,
     onAccent: colors.onAccent,
-    accent: accent.primary,
-    negative: colors.negative,
-    positive: colors.positive,
+    accent: accent.text,
+    negative: colors.negativeText,
+    positive: colors.positiveText,
   }[tone];
 
   return (

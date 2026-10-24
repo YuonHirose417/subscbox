@@ -34,14 +34,14 @@ export function SectionHeader({ title, actionLabel, onAction, trailing, style }:
           hitSlop={12}
           onPress={onAction}
           style={styles.action}>
-          <AppText variant="footnote" style={{ color: accent.primary }}>
+          <AppText variant="footnote" style={{ color: accent.text }}>
             {actionLabel}
           </AppText>
           <Icon
             name="chevron.right"
             fallback="chevron-forward"
             size={11}
-            color={accent.primary}
+            color={accent.text}
             weight="semibold"
           />
         </Pressable>

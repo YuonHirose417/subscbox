@@ -16,10 +16,10 @@ type Props = {
 export function Badge({ label, tone = 'info', style }: Props) {
   const { colors, radius, spacing } = useTheme();
   const map = {
-    negative: [colors.negativeSoft, colors.negative],
-    warning: [colors.warningSoft, colors.warning],
-    positive: [colors.positiveSoft, colors.positive],
-    info: [colors.infoSoft, colors.info],
+    negative: [colors.negativeSoft, colors.negativeText],
+    warning: [colors.warningSoft, colors.warningText],
+    positive: [colors.positiveSoft, colors.positiveText],
+    info: [colors.infoSoft, colors.infoText],
     neutral: [colors.surfaceSecondary, colors.textSecondary],
   } as const;
   const [background, foreground] = map[tone];

@@ -1,25 +1,33 @@
 import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { Alert, Linking } from 'react-native';
 
 import { Card, ListRow, Screen, ScreenHeader } from '@/components/ui';
-import { APP_VERSION, SUPPORT_EMAIL } from '@/constants/app';
+import { APP_VERSION, SUPPORT_CONTACT } from '@/constants/app';
 import { useSettingsStore } from '@/features/settings/store';
 import { ja } from '@/i18n/ja';
 import { useTheme } from '@/theme';
 import { logger } from '@/utils/logger';
 
+/** メールアドレスならメールアプリ、URL ならブラウザでお問い合わせ先を開く */
 async function openContact() {
-  if (!SUPPORT_EMAIL) {
+  const contact = SUPPORT_CONTACT.trim();
+  if (!contact) {
     Alert.alert('準備中です', 'お問い合わせ窓口は公開時に用意します。');
     return;
   }
+  const isUrl = /^https:\/\//i.test(contact);
   const subject = encodeURIComponent('サブスクBoxへのお問い合わせ');
   const body = encodeURIComponent(`\n\n----\nアプリのバージョン：${APP_VERSION}`);
   try {
-    await Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`);
+    if (isUrl) await WebBrowser.openBrowserAsync(contact);
+    else await Linking.openURL(`mailto:${contact}?subject=${subject}&body=${body}`);
   } catch (error) {
-    logger.error('failed to open mail', error);
-    Alert.alert('メールアプリを開けませんでした', `${SUPPORT_EMAIL} までご連絡ください。`);
+    logger.error('failed to open contact', error);
+    Alert.alert(
+      isUrl ? 'ページを開けませんでした' : 'メールアプリを開けませんでした',
+      `${contact} までご連絡ください。`,
+    );
   }
 }
 
