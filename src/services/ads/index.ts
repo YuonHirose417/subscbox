@@ -6,7 +6,6 @@ import { logger } from '@/utils/logger';
 
 import { loadAdsModule, type AdsModule } from './loadAdsModule';
 
-
 /**
  * 広告（Google AdMob・無料版のみ）。
  * ネイティブモジュールは Expo Go・Web には無く、読み込むだけで落ちるため、使える環境でだけ require する。
