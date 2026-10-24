@@ -25,6 +25,7 @@ import { visiblePayments } from '@/domain/payments';
 import { billingEvents } from '@/domain/trend';
 import type { CurrencyCode, DateString, Subscription } from '@/domain/types';
 import { useCategories } from '@/features/categories/store';
+import { PaymentEstimateNotice, PaymentSourceBadge } from '@/features/payments/PaymentNotice';
 import { usePayments } from '@/features/payments/usePayments';
 import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore } from '@/features/settings/store';
@@ -42,6 +43,8 @@ type DayEntry = {
   currency: CurrencyCode;
   /** paid=支払い履歴（過去）、planned=請求予定（未来） */
   kind: 'paid' | 'planned';
+  /** 支払い履歴をユーザーが修正したか（paid のみ） */
+  isUserEdited: boolean;
 };
 
 /** 支払いカレンダー（プレミアム）：月表示で支払日に印を付け、タップでその日の内訳 */
@@ -71,6 +74,7 @@ export default function CalendarScreen() {
         amountMinor: p.amountMinor,
         currency: p.currency,
         kind: 'paid',
+        isUserEdited: p.isUserEdited,
       });
     }
     // 今日より後は請求予定として表示する（支払い履歴は今日までしか作らない）
@@ -88,6 +92,7 @@ export default function CalendarScreen() {
         amountMinor: e.amountMinor,
         currency: e.currency,
         kind: 'planned',
+        isUserEdited: false,
       });
     }
     return list;
@@ -143,6 +148,7 @@ export default function CalendarScreen() {
   return (
     <Screen contentStyle={{ gap: spacing.md }}>
       <ScreenHeader showBack title="支払いカレンダー" />
+      <PaymentEstimateNotice />
       <Card style={{ gap: spacing.sm }}>
         <View style={styles.monthBar}>
           <IconButton
@@ -260,7 +266,7 @@ export default function CalendarScreen() {
             <Pressable
               key={`${e.subscription.id}-${e.kind}`}
               accessibilityRole="button"
-              accessibilityLabel={`${e.subscription.name}、${formatMinor(e.amountMinor, e.currency)}、${e.kind === 'paid' ? '支払い済み' : '請求予定'}`}
+              accessibilityLabel={`${e.subscription.name}、${formatMinor(e.amountMinor, e.currency)}、${e.kind === 'paid' ? (e.isUserEdited ? '支払い済み（修正済み）' : '支払い済み（自動記録）') : '請求予定'}`}
               onPress={() =>
                 router.push({ pathname: '/subscription/[id]', params: { id: e.subscription.id } })
               }
@@ -269,10 +275,11 @@ export default function CalendarScreen() {
               <AppText variant="body" numberOfLines={1} style={styles.flex}>
                 {e.subscription.name}
               </AppText>
-              <Badge
-                label={e.kind === 'paid' ? '支払い済み' : '予定'}
-                tone={e.kind === 'paid' ? 'neutral' : 'info'}
-              />
+              {e.kind === 'paid' ? (
+                <PaymentSourceBadge isUserEdited={e.isUserEdited} />
+              ) : (
+                <Badge label="予定" tone="info" />
+              )}
               <AppText variant="callout">{formatMinor(e.amountMinor, e.currency)}</AppText>
             </Pressable>
           ))

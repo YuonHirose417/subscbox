@@ -2,20 +2,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import {
-  AppText,
-  Badge,
-  Card,
-  EmptyState,
-  PressableScale,
-  Screen,
-  ScreenHeader,
-} from '@/components/ui';
+import { AppText, Card, EmptyState, PressableScale, Screen, ScreenHeader } from '@/components/ui';
 import { formatFullDate } from '@/domain/dates';
 import { formatMinor, formatMoney, fromMinor, toJpy } from '@/domain/money';
 import { PAYMENT_HISTORY_WINDOW_MONTHS, visiblePayments } from '@/domain/payments';
 import type { Payment } from '@/domain/types';
 import { EditPaymentSheet } from '@/features/payments/EditPaymentSheet';
+import { PaymentEstimateNotice, PaymentSourceBadge } from '@/features/payments/PaymentNotice';
 import { usePayments } from '@/features/payments/usePayments';
 import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore } from '@/features/settings/store';
@@ -57,6 +50,7 @@ export default function PaymentHistoryScreen() {
   return (
     <Screen contentStyle={{ gap: spacing.md }}>
       <ScreenHeader showBack title="支払い履歴" />
+      <PaymentEstimateNotice />
       <Card style={{ gap: spacing.xxs }}>
         <AppText variant="footnote" tone="secondary">
           {sub.name}の支払い合計（{payments.length}回）
@@ -75,7 +69,7 @@ export default function PaymentHistoryScreen() {
             <PressableScale
               key={p.id}
               accessibilityRole="button"
-              accessibilityLabel={`${formatFullDate(p.billedOn)}、${formatMinor(p.amountMinor, p.currency)}${p.isUserEdited ? '、修正済み' : ''}`}
+              accessibilityLabel={`${formatFullDate(p.billedOn)}、${formatMinor(p.amountMinor, p.currency)}、${p.isUserEdited ? '修正済み' : '自動記録'}`}
               accessibilityHint="修正・削除できます"
               onPress={() => setEditing(p)}
               scaleTo={0.99}
@@ -83,7 +77,7 @@ export default function PaymentHistoryScreen() {
               <AppText variant="body" style={styles.flex}>
                 {formatFullDate(p.billedOn)}
               </AppText>
-              {p.isUserEdited ? <Badge label="修正済み" tone="neutral" /> : null}
+              <PaymentSourceBadge isUserEdited={p.isUserEdited} />
               <AppText variant="callout">{formatMinor(p.amountMinor, p.currency)}</AppText>
               {index < payments.length - 1 ? (
                 <View
@@ -99,7 +93,7 @@ export default function PaymentHistoryScreen() {
       </Card>
       <AppText variant="caption" tone="tertiary">
         契約開始日から今日までの請求日（直近{PAYMENT_HISTORY_WINDOW_MONTHS}
-        か月）を、その時点の料金で自動的に記録しています。実際の請求と違う場合はタップして修正してください。
+        か月）を、その時点の料金で記録しています。行をタップすると修正・削除できます。修正した行は自動では上書きされません。
       </AppText>
       <EditPaymentSheet payment={editing} onClose={() => setEditing(null)} />
     </Screen>
