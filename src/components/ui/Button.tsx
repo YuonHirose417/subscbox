@@ -34,11 +34,19 @@ export function Button({
   style,
   accessibilityLabel,
 }: Props) {
-  const { colors, accent, radius, sizes, spacing, accentShadow } = useTheme();
+  const { colors, accent, radius, sizes, spacing } = useTheme();
   const inactive = !!(disabled || loading);
   const height = size === 'md' ? sizes.buttonHeight : sizes.buttonHeightSmall;
   const gradient =
-    variant === 'primary' ? accent.gradient : variant === 'soft' ? accent.gradientSoft : null;
+    variant === 'primary' ? accent.gradient : variant === 'soft' ? accent.gradientCta : null;
+  // 発光はアクセントの面を持つボタンだけ（押せないときは消す）
+  const glow = inactive
+    ? undefined
+    : variant === 'primary'
+      ? accent.glow
+      : variant === 'soft'
+        ? accent.ctaGlow
+        : undefined;
 
   const textColor =
     variant === 'secondary'
@@ -68,7 +76,7 @@ export function Button({
           height,
           borderRadius: radius.buttonLarge,
           opacity: inactive ? 0.45 : 1,
-          boxShadow: variant === 'primary' && !inactive ? accentShadow : undefined,
+          boxShadow: glow,
         },
         style,
       ]}>
@@ -80,8 +88,8 @@ export function Button({
         {gradient ? (
           <LinearGradient
             colors={gradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+            start={{ x: 0, y: variant === 'soft' ? 0.5 : 0 }}
+            end={{ x: 1, y: variant === 'soft' ? 0.5 : 1 }}
             style={StyleSheet.absoluteFill}
           />
         ) : null}

@@ -19,7 +19,7 @@ export function SectionHeader({ title, actionLabel, onAction, trailing, style }:
   const { accent, spacing } = useTheme();
   return (
     <View style={[styles.row, { gap: spacing.xs }, style]}>
-      <AppText variant="headline" accessibilityRole="header" style={styles.title}>
+      <AppText variant="section" accessibilityRole="header" style={styles.title}>
         {title}
       </AppText>
       {trailing ? (

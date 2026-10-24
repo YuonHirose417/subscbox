@@ -76,6 +76,7 @@ export default function HomeScreen() {
             icon="gearshape"
             fallback="settings-outline"
             accessibilityLabel={ja.screens.settings.title}
+            size={40}
             onPress={() => router.push('/settings')}
           />
         </View>
@@ -182,11 +183,11 @@ function HomeSkeleton() {
   const { spacing, radius } = useTheme();
   return (
     <View style={{ gap: spacing.md }}>
-      <Skeleton width="60%" height={44} />
+      <Skeleton width="60%" height={48} />
       <Skeleton width="35%" height={14} />
-      <Skeleton height={38} radius={radius.pill} />
+      <Skeleton height={36} radius={radius.pill} />
       <View style={[styles.diff, { gap: spacing.lg }]}>
-        <Skeleton width={150} height={150} radius={75} />
+        <Skeleton width={164} height={164} radius={82} />
         <View style={{ flex: 1, gap: spacing.sm }}>
           {[0, 1, 2, 3].map((i) => (
             <Skeleton key={i} height={12} />
@@ -201,7 +202,7 @@ function HomeSkeleton() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'flex-start', paddingTop: 8 },
-  headerTitle: { flex: 1, lineHeight: 30 },
+  headerTitle: { flex: 1, lineHeight: 30, fontWeight: '700' },
   diff: { flexDirection: 'row', alignItems: 'center' },
   fab: { position: 'absolute', alignSelf: 'center' },
 });

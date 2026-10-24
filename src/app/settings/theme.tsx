@@ -34,7 +34,7 @@ export default function ThemeSettingsScreen() {
   return (
     <Screen contentStyle={{ gap: spacing.md }}>
       <ScreenHeader showBack title={ja.settings.theme} />
-      <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+      <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
         {THEMES.map((t, i) => (
           <ListRow
             key={t}
@@ -53,7 +53,7 @@ export default function ThemeSettingsScreen() {
       </AppText>
 
       <SectionHeader title="テーマカラー" />
-      <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+      <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
         {PRESET_IDS.map((id, i) => {
           const palette = accentPresets[id][scheme];
           const locked = !isPremium && id !== 'default';

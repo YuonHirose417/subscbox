@@ -29,6 +29,8 @@ type Props = {
 };
 
 const LEADING_WIDTH = 28;
+/** 淡い色の円に入れたアイコン（詳細画面の操作行。カンプ実測 34pt） */
+const LEADING_BADGE = 34;
 
 export function ListRow({
   title,
@@ -44,33 +46,40 @@ export function ListRow({
   onPress,
   accessibilityLabel,
 }: Props) {
-  const { colors, accent, spacing, radius, sizes } = useTheme();
+  const { colors, accent, spacing, sizes } = useTheme();
   const tint = destructive ? colors.negative : (iconColor ?? accent.primary);
   const hasLeading = !!(leading || icon);
   const chevron = showChevron ?? !!onPress;
+  const leadingSize = iconBackground ? LEADING_BADGE : LEADING_WIDTH;
 
   const content = (
-    <View style={[styles.row, { minHeight: sizes.touchTarget + spacing.xs, gap: spacing.sm }]}>
+    <View
+      style={[
+        styles.row,
+        // 行の高さはカンプ実測（設定 46pt / 操作行 48pt）。指で押せる 44pt は下回らない
+        { minHeight: iconBackground ? 48 : 46, gap: spacing.sm },
+      ]}>
       {leading ??
         (icon ? (
           <View
             style={[
               styles.leading,
+              { width: leadingSize, height: leadingSize },
               iconBackground
-                ? {
-                    backgroundColor: iconBackground,
-                    borderRadius: radius.sm,
-                    borderCurve: 'continuous',
-                  }
+                ? { backgroundColor: iconBackground, borderRadius: leadingSize / 2 }
                 : null,
             ]}>
-            <Icon name={icon} size={iconBackground ? 16 : 19} color={tint} />
+            <Icon name={icon} size={iconBackground ? 17 : 19} color={tint} />
           </View>
         ) : null)}
       <AppText
         variant="body"
         numberOfLines={1}
-        style={[styles.title, destructive ? { color: colors.negativeText } : null]}>
+        style={[
+          styles.title,
+          iconBackground ? styles.strong : null,
+          destructive ? { color: colors.negativeText } : null,
+        ]}>
         {title}
       </AppText>
       {value ? (
@@ -83,7 +92,7 @@ export function ListRow({
         <Icon
           name="chevron.right"
           fallback="chevron-forward"
-          size={13}
+          size={14}
           color={colors.textTertiary}
           weight="semibold"
         />
@@ -93,7 +102,7 @@ export function ListRow({
           style={[
             styles.separator,
             {
-              left: hasLeading ? LEADING_WIDTH + spacing.sm : 0,
+              left: hasLeading ? leadingSize + spacing.sm : 0,
               height: sizes.hairline,
               backgroundColor: colors.hairline,
             },
@@ -118,12 +127,11 @@ export function ListRow({
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center' },
   leading: {
-    width: LEADING_WIDTH,
-    height: LEADING_WIDTH,
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: { flex: 1 },
+  strong: { fontWeight: '600' },
   value: { flexShrink: 1, textAlign: 'right' },
   separator: { position: 'absolute', right: 0, bottom: 0 },
 });

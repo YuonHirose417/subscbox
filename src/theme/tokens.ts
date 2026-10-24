@@ -8,8 +8,8 @@ export type ColorScheme = 'light' | 'dark';
 
 export type Palette = {
   background: string;
-  /** 画面上部のごく薄いラベンダー〜ピンク（ホーム上部）。上→下で background に溶ける */
-  backgroundTint: readonly [string, string, string];
+  /** ホーム上部の柔らかい色の塊（青・ラベンダー・ピンク）。不透明度込みの色 */
+  heroBlobs: readonly [string, string, string];
   surface: string;
   surfaceSecondary: string;
   border: string;
@@ -26,6 +26,8 @@ export type Palette = {
   glass: string;
   /** 詳細画面ヘッダー等の暗いオーバーレイ */
   scrim: readonly [string, string];
+  /** 詳細画面ヘッダーの地（カンプ実測 紺〜スレート #1F2A3F） */
+  headerBase: string;
   positive: string;
   negative: string;
   warning: string;
@@ -42,12 +44,13 @@ export type Palette = {
 };
 
 const light: Palette = {
-  background: '#F5F6FA',
-  backgroundTint: ['#ECEBFF', '#F7EEFB', '#F5F6FA'],
+  // 背景とカードの差を小さくした静かな地（カンプ実測 #F5F7F9〜#F7FAFC）
+  background: '#F6F8FB',
+  heroBlobs: ['rgba(77, 132, 255, 0.20)', 'rgba(150, 120, 255, 0.20)', 'rgba(255, 120, 200, 0.16)'],
   surface: '#FFFFFF',
-  surfaceSecondary: '#F0F2F7',
-  border: 'rgba(15, 23, 42, 0.06)',
-  hairline: 'rgba(15, 23, 42, 0.08)',
+  surfaceSecondary: '#EEF2F9',
+  border: 'rgba(15, 23, 42, 0.05)',
+  hairline: 'rgba(15, 23, 42, 0.1)',
   textPrimary: '#0F172A',
   // カンプより少し濃くして、背景・カードの上で WCAG AA（4.5:1）を満たす
   textSecondary: '#56667D',
@@ -57,6 +60,7 @@ const light: Palette = {
   skeletonHighlight: 'rgba(255, 255, 255, 0.7)',
   glass: 'rgba(255, 255, 255, 0.2)',
   scrim: ['rgba(11, 13, 30, 0.55)', 'rgba(11, 13, 30, 0.85)'],
+  headerBase: '#1C2640',
   positive: '#10B981',
   negative: '#F43F5E',
   warning: '#F59E0B',
@@ -72,11 +76,12 @@ const light: Palette = {
 };
 
 const dark: Palette = {
-  background: '#0B0D14',
-  backgroundTint: ['#171830', '#140F22', '#0B0D14'],
-  surface: '#151823',
-  surfaceSecondary: '#1D2130',
-  border: 'rgba(255, 255, 255, 0.06)',
+  // 暗い地にネオンのアクセントが映えるよう、背景は青みのある黒
+  background: '#07080F',
+  heroBlobs: ['rgba(61, 123, 255, 0.24)', 'rgba(139, 92, 255, 0.24)', 'rgba(255, 92, 168, 0.14)'],
+  surface: '#11131E',
+  surfaceSecondary: '#1A1D2B',
+  border: 'rgba(255, 255, 255, 0.07)',
   hairline: 'rgba(255, 255, 255, 0.08)',
   textPrimary: '#F1F5F9',
   textSecondary: '#94A3B8',
@@ -86,6 +91,7 @@ const dark: Palette = {
   skeletonHighlight: 'rgba(255, 255, 255, 0.08)',
   glass: 'rgba(255, 255, 255, 0.14)',
   scrim: ['rgba(5, 6, 12, 0.55)', 'rgba(5, 6, 12, 0.9)'],
+  headerBase: '#10142A',
   positive: '#34D399',
   negative: '#FB7185',
   warning: '#FBBF24',
@@ -102,20 +108,30 @@ const dark: Palette = {
 
 export const palettes: Record<ColorScheme, Palette> = { light, dark };
 
+/** 発光（色付きの柔らかい影）。アクセント部品にだけ使う。文字・背景・カードには付けない */
+function glow(rgb: string, alpha: number, blur = 20, y = 6): string {
+  return `0 ${y}px ${blur}px rgba(${rgb}, ${alpha})`;
+}
+
 /**
  * アクセントカラー。面積を小さく使う（ボタン・選択状態・グラフ・バッジ）。
- * 「テーマカラーの切り替え」（プレミアム）用にプリセット化している。default がカンプの配色。
+ * 「テーマカラーの切り替え」（プレミアム）用にプリセット化している。default はネオン寄り
+ * （エレクトリックブルー→パープル。カンプより彩度を上げている）。
  */
 export type Accent = {
   primary: string;
   secondary: string;
   tertiary: string;
-  /** 主要ボタン・選択中セグメント（約135°） */
+  /** 主要ボタン・選択中セグメント・チップ・＋ボタン（約135°） */
   gradient: readonly [string, string];
-  /** 「カスタムで追加する」等の大ボタン（淡いグラデーション） */
-  gradientSoft: readonly [string, string];
-  /** グラフの非選択バー等 */
+  /** 「カスタムで追加する」の大ボタン（ピンク→ブルー→シアン）。文字は中央の濃い色の上に載る */
+  gradientCta: readonly [string, string, string];
+  /** グラフの非選択バー（上→下） */
   gradientMuted: readonly [string, string];
+  /** gradient の部品に付ける発光 */
+  glow: string;
+  /** gradientCta の大ボタンに付ける色付きの影 */
+  ctaGlow: string;
   /** Toggle のトラック等 */
   control: string;
   /** リンク等の文字色（AA 4.5:1 を満たす濃さ） */
@@ -130,24 +146,28 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
   default: {
     label: 'ネオンブルー',
     light: {
-      primary: '#4F7BFF',
-      secondary: '#8B5CF6',
+      primary: '#3D7BFF',
+      secondary: '#8B5CFF',
       tertiary: '#22D3EE',
-      gradient: ['#5E8BFF', '#8B7CFF'],
-      gradientSoft: ['#C4A5FB', '#93C5FD'],
-      gradientMuted: ['#C7D6FF', '#DCD4FF'],
-      control: '#4F7BFF',
+      gradient: ['#3D7BFF', '#8B5CFF'],
+      gradientCta: ['#F26BDB', '#5468FF', '#22C8F0'],
+      gradientMuted: ['#D3DDFF', '#BCD0FF'],
+      glow: glow('92, 100, 255', 0.3),
+      ctaGlow: glow('84, 104, 255', 0.3, 24, 8),
+      control: '#3D7BFF',
       text: '#3D63E8',
     },
     dark: {
-      primary: '#7397FF',
-      secondary: '#A78BFA',
-      tertiary: '#4FE0F5',
-      gradient: ['#6E97FF', '#9B8CFF'],
-      gradientSoft: ['#9F86E8', '#6FA3E8'],
-      gradientMuted: ['#2C3866', '#3A3270'],
-      control: '#6E8FFF',
-      text: '#7397FF',
+      primary: '#5B8CFF',
+      secondary: '#A07BFF',
+      tertiary: '#3BE0F5',
+      gradient: ['#3D7BFF', '#8B5CFF'],
+      gradientCta: ['#E05BD0', '#5468FF', '#1FB8E0'],
+      gradientMuted: ['#262E52', '#2E3566'],
+      glow: glow('110, 110, 255', 0.35, 22),
+      ctaGlow: glow('90, 110, 255', 0.35, 24, 8),
+      control: '#5B7CFF',
+      text: '#7FA2FF',
     },
   },
   ocean: {
@@ -156,9 +176,11 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       primary: '#0EA5E9',
       secondary: '#3B82F6',
       tertiary: '#22D3EE',
-      gradient: ['#22B5F0', '#3B82F6'],
-      gradientSoft: ['#A5E3FB', '#A5C8FD'],
-      gradientMuted: ['#C5E9FA', '#CFE0FD'],
+      gradient: ['#0EA5E9', '#3B6BF6'],
+      gradientCta: ['#22D3EE', '#2B7BF0', '#6366F1'],
+      gradientMuted: ['#CFEAFB', '#B9DDF7'],
+      glow: glow('14, 165, 233', 0.28),
+      ctaGlow: glow('43, 123, 240', 0.28, 24, 8),
       control: '#0EA5E9',
       text: '#0369A1',
     },
@@ -166,9 +188,11 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       primary: '#38BDF8',
       secondary: '#60A5FA',
       tertiary: '#4FE0F5',
-      gradient: ['#38BDF8', '#60A5FA'],
-      gradientSoft: ['#4C9AC2', '#5B86C9'],
+      gradient: ['#0EA5E9', '#3B6BF6'],
+      gradientCta: ['#1EB8D6', '#2B7BF0', '#5B5EE6'],
       gradientMuted: ['#173A52', '#1E335C'],
+      glow: glow('56, 189, 248', 0.32, 22),
+      ctaGlow: glow('43, 123, 240', 0.32, 24, 8),
       control: '#38BDF8',
       text: '#38BDF8',
     },
@@ -179,9 +203,11 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       primary: '#EC4899',
       secondary: '#A855F7',
       tertiary: '#F472B6',
-      gradient: ['#F15FA6', '#B46BF8'],
-      gradientSoft: ['#F9B8D9', '#D6B4FB'],
-      gradientMuted: ['#FBD3E7', '#E6D3FC'],
+      gradient: ['#EC4899', '#9F4BF7'],
+      gradientCta: ['#FB7185', '#E0409A', '#9F4BF7'],
+      gradientMuted: ['#FBD3E7', '#EBCBFA'],
+      glow: glow('236, 72, 153', 0.28),
+      ctaGlow: glow('224, 64, 154', 0.28, 24, 8),
       control: '#EC4899',
       text: '#BE185D',
     },
@@ -189,9 +215,11 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       primary: '#F472B6',
       secondary: '#C084FC',
       tertiary: '#F9A8D4',
-      gradient: ['#F472B6', '#C084FC'],
-      gradientSoft: ['#B66A93', '#9670C2'],
+      gradient: ['#E2408F', '#9F4BF7'],
+      gradientCta: ['#E85A70', '#D0378E', '#8E40E6'],
       gradientMuted: ['#4A2038', '#3B2552'],
+      glow: glow('244, 114, 182', 0.32, 22),
+      ctaGlow: glow('224, 64, 154', 0.32, 24, 8),
       control: '#F472B6',
       text: '#F472B6',
     },
@@ -202,9 +230,11 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       primary: '#10B981',
       secondary: '#14B8A6',
       tertiary: '#22D3EE',
-      gradient: ['#20C08D', '#14A8B8'],
-      gradientSoft: ['#A7EBD3', '#A5E4EE'],
-      gradientMuted: ['#C9F2E3', '#C8EEF2'],
+      gradient: ['#0EA371', '#0E94A8'],
+      gradientCta: ['#34D399', '#0E9F8E', '#0EA5E9'],
+      gradientMuted: ['#C9F2E3', '#B5E8EE'],
+      glow: glow('16, 185, 129', 0.28),
+      ctaGlow: glow('14, 159, 142', 0.28, 24, 8),
       control: '#10B981',
       text: '#047857',
     },
@@ -212,9 +242,11 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
       primary: '#34D399',
       secondary: '#2DD4BF',
       tertiary: '#4FE0F5',
-      gradient: ['#34D399', '#2DD4BF'],
-      gradientSoft: ['#3E9C7C', '#3A9BA6'],
+      gradient: ['#0EA371', '#0E94A8'],
+      gradientCta: ['#22B985', '#0E9F8E', '#0B8FCC'],
       gradientMuted: ['#173F33', '#163E40'],
+      glow: glow('52, 211, 153', 0.32, 22),
+      ctaGlow: glow('14, 159, 142', 0.32, 24, 8),
       control: '#34D399',
       text: '#34D399',
     },
@@ -222,16 +254,17 @@ export const accentPresets: Record<AccentPresetId, AccentPreset> = {
 };
 
 /**
- * カテゴリカラー（グラフ・カテゴリタイル）。タイル背景はこの色の8〜10%不透明度。
- * ホームのドーナツ（カンプ）から採色。SNS はカンプのドーナツに無いため他と区別できる藍色にした。
+ * カテゴリカラー（グラフ・カテゴリタイル）。タイル背景はこの色の8〜12%不透明度。
+ * ネオン寄りの発色（ブルー・ピンク・シアン・アンバー・コーラル・パープル）。
+ * グラフでは各色から少し明るい色へのグラデーションで塗る（lighten）。
  */
 export const categoryColors = {
-  video_music: '#59A6FD',
-  productivity: '#FC86A9',
-  cloud: '#5FE2D1',
-  game: '#FECA68',
-  sns: '#818CF8',
-  other: '#AF7CF8',
+  video_music: '#3D8BFF',
+  productivity: '#FF4FA3',
+  cloud: '#16CFE8',
+  game: '#FFAE33',
+  sns: '#FF7A59',
+  other: '#9B5CFF',
 } as const;
 
 export type CategoryColorKey = keyof typeof categoryColors;
@@ -244,6 +277,22 @@ export function withAlpha(hex: string, alpha: number): string {
   return `${hex.slice(0, 7)}${a}`;
 }
 
+/** '#RRGGBB' を白に寄せる（グラフの濃淡グラデーションの明るい側） */
+export function lighten(hex: string, amount: number): string {
+  const n = parseInt(hex.slice(1, 7), 16);
+  const mix = (c: number) => Math.round(c + (255 - c) * amount);
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(mix);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0').toUpperCase()}`;
+}
+
+/** '#RRGGBB' を黒に寄せる（淡い色の面に載せる同系色の文字を読みやすくする） */
+export function shade(hex: string, amount: number): string {
+  const n = parseInt(hex.slice(1, 7), 16);
+  const mix = (c: number) => Math.round(c * (1 - amount));
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(mix);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0').toUpperCase()}`;
+}
+
 export const spacing = {
   xxs: 4,
   xs: 8,
@@ -253,12 +302,14 @@ export const spacing = {
   xl: 24,
   xxl: 32,
   xxxl: 40,
-  /** 画面の左右余白 */
-  screen: 20,
+  /** 画面の左右余白（カンプ実測 22〜24pt） */
+  screen: 22,
 } as const;
 
 export const radius = {
-  card: 20,
+  /** 大きいカード（カンプ実測 約22pt） */
+  card: 22,
+  /** 内部カード・タイル・リストのカード（設定など。カンプ実測 約15pt） */
   inner: 16,
   buttonLarge: 28,
   icon: 12,
@@ -266,15 +317,10 @@ export const radius = {
   pill: 999,
 } as const;
 
+/** カードの影。背景との差を小さくし、広く柔らかく薄く */
 export const shadows: Record<ColorScheme, string | undefined> = {
-  light: '0 4px 20px rgba(15, 23, 42, 0.05)',
+  light: '0 1px 2px rgba(15, 23, 42, 0.03), 0 8px 28px rgba(40, 56, 110, 0.06)',
   // ダークは影なし＋border で区切る
-  dark: undefined,
-};
-
-/** 主要ボタン用のごく薄い色付き影（1層まで） */
-export const accentShadow: Record<ColorScheme, string | undefined> = {
-  light: '0 6px 16px rgba(94, 139, 255, 0.22)',
   dark: undefined,
 };
 
@@ -291,22 +337,27 @@ export const motion = {
 export const sizes = {
   touchTarget: 44,
   iconButton: 44,
-  serviceIcon: 44,
+  /** 一覧・ホームの行のサービスアイコン（カンプ実測 46pt） */
+  serviceIcon: 46,
   serviceIconLarge: 72,
   buttonHeight: 56,
   buttonHeightSmall: 40,
+  /** 検索欄（カンプ実測 約40pt） */
+  searchHeight: 40,
+  /** セグメント（カンプ実測 33〜36pt） */
+  segmentHeight: 36,
   hairline: 0.5,
 } as const;
 
 /** 自作カテゴリ・カスタムサービスのアイコンに選べる色 */
 export const customColorChoices = [
-  '#59A6FD',
-  '#FC86A9',
-  '#5FE2D1',
-  '#FECA68',
+  '#3D8BFF',
+  '#FF4FA3',
+  '#16CFE8',
+  '#FFAE33',
+  '#FF7A59',
+  '#9B5CFF',
   '#818CF8',
-  '#AF7CF8',
-  '#F97316',
   '#10B981',
   '#64748B',
 ] as const;

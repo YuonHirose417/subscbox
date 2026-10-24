@@ -50,7 +50,7 @@ export default function NotificationSettingsScreen() {
       <ScreenHeader showBack title="通知設定" />
 
       {permission === 'denied' && defaults.enabled ? (
-        <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+        <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
           <ListRow
             icon="exclamationmark.triangle"
             iconColor={colors.warning}
@@ -61,7 +61,7 @@ export default function NotificationSettingsScreen() {
         </Card>
       ) : null}
 
-      <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+      <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
         <FormRow label="更新前に通知する" separator={defaults.enabled}>
           <Toggle
             value={defaults.enabled}

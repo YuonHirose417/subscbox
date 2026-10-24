@@ -50,10 +50,11 @@ export function SubscriptionRow({
       accessibilityLabel={label}
       onPress={onPress}
       scaleTo={0.98}
-      style={[styles.row, { gap: spacing.sm, paddingVertical: spacing.sm }]}>
+      // 行の間隔はカンプ実測 71〜73pt
+      style={[styles.row, { gap: spacing.sm, paddingVertical: spacing.xs }]}>
       <ServiceIcon subscription={sub} />
       <View style={styles.main}>
-        <AppText variant="headline" numberOfLines={1}>
+        <AppText variant="rowTitle" numberOfLines={1}>
           {sub.name}
         </AppText>
         {sub.planName ? (
@@ -79,7 +80,7 @@ export function SubscriptionRow({
         <Icon
           name="chevron.right"
           fallback="chevron-forward"
-          size={13}
+          size={14}
           color={colors.textTertiary}
           weight="semibold"
         />
@@ -102,7 +103,7 @@ export function SubscriptionRow({
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center' },
-  main: { flex: 1, gap: 1 },
+  main: { flex: 1 },
   side: { alignItems: 'flex-end', flexShrink: 1, maxWidth: '45%' },
   price: { textAlign: 'right' },
   badge: { alignSelf: 'flex-end' },

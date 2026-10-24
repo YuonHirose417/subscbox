@@ -13,8 +13,9 @@ type Props = {
 /** 色ドット・ラベル・値（金額または割合）の縦並び凡例 */
 export function ChartLegend({ items, style }: Props) {
   const { spacing } = useTheme();
+  // 行の間隔はカンプ実測 31pt
   return (
-    <View style={[{ gap: spacing.sm }, style]}>
+    <View style={[{ gap: 13 }, style]}>
       {items.map((item) => (
         <View
           key={item.label}
@@ -22,7 +23,11 @@ export function ChartLegend({ items, style }: Props) {
           accessible
           accessibilityLabel={`${item.label}、${item.value}`}>
           <View style={[styles.dot, { backgroundColor: item.color }]} />
-          <AppText variant="footnote" tone="secondary" numberOfLines={1} style={styles.label}>
+          <AppText
+            variant="footnote"
+            tone="secondary"
+            numberOfLines={1}
+            style={[styles.label, styles.medium]}>
             {item.label}
           </AppText>
           <AppText variant="footnote" style={styles.value}>
@@ -38,5 +43,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center' },
   dot: { width: 10, height: 10, borderRadius: 5 },
   label: { flex: 1 },
+  medium: { fontWeight: '500' },
   value: { fontVariant: ['tabular-nums'], fontWeight: '500' },
 });

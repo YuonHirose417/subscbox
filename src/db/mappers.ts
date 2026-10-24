@@ -10,6 +10,7 @@ import type {
   SubscriptionIcon,
   SubscriptionInput,
 } from '@/domain/types';
+import { categoryColors, type CategoryColorKey } from '@/theme/tokens';
 
 import type { SqlValue } from './adapter';
 
@@ -137,13 +138,16 @@ export type CategoryRow = {
 };
 
 export function rowToCategory(row: CategoryRow): Category {
+  const isDefault = row.is_default === 1;
   return {
     id: row.id,
     name: row.name,
-    color: row.color,
+    // 既定カテゴリの色はユーザーが変更できないので、保存値ではなく現在のテーマのカテゴリカラーで表示する
+    // （配色の変更を既存ユーザーにも反映するため。DB の値は書き換えない）
+    color: isDefault ? (categoryColors[row.id as CategoryColorKey] ?? row.color) : row.color,
     icon: row.icon,
     sortOrder: row.sort_order,
-    isDefault: row.is_default === 1,
+    isDefault,
   };
 }
 

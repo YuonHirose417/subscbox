@@ -70,8 +70,8 @@ export default function AnalyticsScreen() {
         />
       ) : null}
 
-      {/* 月別の支出推移 */}
-      <Card style={{ gap: spacing.sm }}>
+      {/* 月別の支出推移（カンプどおりカードに入れず背景の上に置く） */}
+      <View style={{ gap: spacing.sm }}>
         <SectionHeader
           title={trendTitle}
           trailing={a.hasData ? `平均 ${formatMoney(a.average)}` : undefined}
@@ -79,6 +79,8 @@ export default function AnalyticsScreen() {
         {a.hasData ? (
           <BarChart
             key={`${period}-${a.trend.length}`}
+            // カンプは小さめのグラフ（吹き出しから月ラベルまで 約120pt）
+            height={160}
             bars={a.trend.map((p) => ({ key: p.key, label: p.label, value: p.total }))}
             highlightIndex={a.trend.length - 1}
             formatValue={(v) => formatMoney(v)}
@@ -87,10 +89,10 @@ export default function AnalyticsScreen() {
         ) : (
           <EmptyState icon="chart.bar" title={ja.empty.analyticsTitle} />
         )}
-      </Card>
+      </View>
 
       {/* カテゴリ別の支出（カンプ2画面目） */}
-      <AppText variant="title" accessibilityRole="header" style={{ marginTop: spacing.xs }}>
+      <AppText variant="screenTitle" accessibilityRole="header" style={{ marginTop: spacing.sm }}>
         カテゴリ別の支出
       </AppText>
       <SegmentedControl options={PERIODS} value={categoryPeriod} onChange={setCategoryPeriod} />
@@ -101,7 +103,7 @@ export default function AnalyticsScreen() {
           legendValue="ratio"
           centerLabel={CENTER_LABEL[categoryPeriod]}
           showSuffix={false}
-          size={160}
+          size={164}
         />
       </View>
 

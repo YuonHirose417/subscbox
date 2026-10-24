@@ -44,9 +44,10 @@ export function FormRow({
     <View
       style={[
         {
-          paddingVertical: spacing.sm,
+          // 1行の高さはカンプ実測 約42〜44pt（指で押せる 44pt は保つ）
+          paddingVertical: 10,
           gap: spacing.xxs,
-          minHeight: sizes.touchTarget + spacing.xs,
+          minHeight: sizes.touchTarget,
           justifyContent: 'center',
         },
         style,
@@ -61,7 +62,7 @@ export function FormRow({
           <Icon
             name="chevron.right"
             fallback="chevron-forward"
-            size={13}
+            size={14}
             color={colors.textTertiary}
             weight="semibold"
           />

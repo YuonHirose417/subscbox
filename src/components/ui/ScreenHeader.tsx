@@ -14,12 +14,12 @@ type Props = {
   showBack?: boolean;
   /** 右上のボタン等 */
   trailing?: ReactNode;
-  /** 長いタイトル用に一回り小さくする（カンプの「使っていない可能性のあるサブスク」） */
-  compact?: boolean;
+  /** 一覧のような大きなタイトル（26pt）。既定は下層画面の 22pt（カンプ実測） */
+  large?: boolean;
 };
 
 /** largeTitle の画面タイトル。Stack の標準ヘッダーは使わずカンプの見た目で描画する */
-export function ScreenHeader({ title, showBack = false, trailing, compact = false }: Props) {
+export function ScreenHeader({ title, showBack = false, trailing, large = false }: Props) {
   const { spacing } = useTheme();
   return (
     <View style={{ gap: spacing.sm }}>
@@ -34,9 +34,9 @@ export function ScreenHeader({ title, showBack = false, trailing, compact = fals
       ) : null}
       <View style={styles.row}>
         <AppText
-          variant={compact ? 'title' : 'largeTitle'}
+          variant={large ? 'largeTitle' : 'screenTitle'}
           accessibilityRole="header"
-          style={[styles.title, compact ? styles.compact : null]}>
+          style={styles.title}>
           {title}
         </AppText>
         {trailing}
@@ -48,5 +48,4 @@ export function ScreenHeader({ title, showBack = false, trailing, compact = fals
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center' },
   title: { flex: 1 },
-  compact: { fontWeight: '700' },
 });

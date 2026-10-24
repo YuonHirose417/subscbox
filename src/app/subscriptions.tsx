@@ -74,6 +74,7 @@ export default function SubscriptionsScreen() {
     <Screen scroll={false} contentStyle={{ paddingBottom: 0, gap: spacing.sm }}>
       <ScreenHeader
         showBack
+        large
         title={t.title}
         trailing={
           <IconButton

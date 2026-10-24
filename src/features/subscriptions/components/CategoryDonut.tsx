@@ -28,7 +28,7 @@ export function CategoryDonut({
   period,
   legendValue = 'amount',
   centerLabel = '合計',
-  size = 150,
+  size = 164,
   showSuffix = true,
 }: Props) {
   const { spacing, colors } = useTheme();

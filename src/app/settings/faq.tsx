@@ -26,7 +26,7 @@ export default function FaqScreen() {
       ))}
 
       <SectionHeader title="アプリについて" />
-      <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+      <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
         <ListRow
           icon="hand.raised"
           title="プライバシーポリシー"

@@ -22,7 +22,7 @@ export default function LegalScreen() {
         <AppText variant="footnote" tone="secondary">
           本アプリは以下のオープンソースソフトウェアを利用しています。
         </AppText>
-        <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+        <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
           {licenses.map((item, index) => (
             <View
               key={item.name}

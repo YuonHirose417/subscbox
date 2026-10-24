@@ -27,7 +27,7 @@ export function IconButton({
   size,
   style,
 }: Props) {
-  const { colors, accent, sizes, shadow, accentShadow } = useTheme();
+  const { colors, accent, sizes, shadow } = useTheme();
   const diameter = size ?? sizes.iconButton;
   const iconColor = variant === 'surface' ? colors.textPrimary : colors.onAccent;
 
@@ -43,7 +43,7 @@ export function IconButton({
           height: diameter,
           borderRadius: diameter / 2,
           boxShadow:
-            variant === 'surface' ? shadow : variant === 'gradient' ? accentShadow : undefined,
+            variant === 'surface' ? shadow : variant === 'gradient' ? accent.glow : undefined,
         },
         style,
       ]}>

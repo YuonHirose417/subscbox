@@ -30,7 +30,7 @@ export function SearchField({
   autoFocus,
   trailing,
 }: Props) {
-  const { colors, radius, spacing, typography } = useTheme();
+  const { colors, radius, spacing, typography, sizes } = useTheme();
   return (
     <View
       style={[
@@ -40,6 +40,7 @@ export function SearchField({
           borderRadius: radius.pill,
           paddingHorizontal: spacing.md,
           gap: spacing.xs,
+          minHeight: sizes.searchHeight,
         },
         style,
       ]}>
@@ -56,7 +57,7 @@ export function SearchField({
         clearButtonMode="never"
         accessibilityLabel={placeholder}
         maxFontSizeMultiplier={maxFontSizeMultiplier}
-        style={[styles.input, typography.body, { color: colors.textPrimary }]}
+        style={[styles.input, typography.body, { fontSize: 14, color: colors.textPrimary }]}
       />
       {value.length > 0 ? (
         <Pressable
@@ -78,6 +79,6 @@ export function SearchField({
 }
 
 const styles = StyleSheet.create({
-  field: { flexDirection: 'row', alignItems: 'center', minHeight: 44 },
-  input: { flex: 1, paddingVertical: 10 },
+  field: { flexDirection: 'row', alignItems: 'center' },
+  input: { flex: 1, paddingVertical: 8 },
 });

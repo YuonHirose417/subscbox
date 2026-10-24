@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import type { ReactNode } from 'react';
 import {
   ScrollView,
@@ -12,11 +11,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@/theme';
 
+import { HeroBlobs } from './HeroBlobs';
+
 type Props = {
   children: ReactNode;
   /** 縦スクロールさせるか（既定 true） */
   scroll?: boolean;
-  /** 画面上部の淡いラベンダー〜ピンクのグラデーション（ホーム等） */
+  /** 画面上部の右側に、青・ラベンダー・ピンクの柔らかい色の塊を敷く（ホーム） */
   tint?: boolean;
   /** 左右余白（既定 20）を付けるか */
   padded?: boolean;
@@ -50,16 +51,7 @@ export function Screen({
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      {tint ? (
-        <LinearGradient
-          pointerEvents="none"
-          colors={colors.backgroundTint}
-          locations={[0, 0.5, 1]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={styles.tint}
-        />
-      ) : null}
+      {tint ? <HeroBlobs colors={colors.heroBlobs} /> : null}
       {scroll ? (
         <ScrollView
           contentInsetAdjustmentBehavior="never"
@@ -77,5 +69,4 @@ export function Screen({
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  tint: { position: 'absolute', top: 0, left: 0, right: 0, height: 420 },
 });

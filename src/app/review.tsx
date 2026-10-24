@@ -45,7 +45,7 @@ export default function ReviewScreen() {
 
   return (
     <Screen contentStyle={{ gap: spacing.md }}>
-      <ScreenHeader showBack compact title="使っていない可能性のあるサブスク" />
+      <ScreenHeader showBack title="使っていない可能性のあるサブスク" />
       {candidates.length === 0 ? (
         <EmptyState
           icon="hourglass"
@@ -65,10 +65,11 @@ export default function ReviewScreen() {
                 onPress={() =>
                   router.push({ pathname: '/subscription/[id]', params: { id: sub.id } })
                 }
-                style={[styles.row, { gap: spacing.sm, paddingVertical: spacing.sm }]}>
+                // 行の間隔はカンプ実測 68pt
+                style={[styles.row, { gap: spacing.sm, paddingVertical: 6 }]}>
                 <ServiceIcon subscription={sub} />
                 <View style={styles.flex}>
-                  <AppText variant="headline" numberOfLines={1}>
+                  <AppText variant="rowTitle" numberOfLines={1}>
                     {sub.name}
                   </AppText>
                   <AppText variant="footnote" tone="negative" numberOfLines={1}>
@@ -107,14 +108,18 @@ export default function ReviewScreen() {
             onPress={explainSavings}
             style={[styles.savings, { borderRadius: radius.inner }]}>
             <LinearGradient
-              colors={[withAlpha(colors.negative, 0.1), withAlpha(accent.secondary, 0.14)]}
+              colors={[withAlpha(colors.negative, 0.13), withAlpha(accent.secondary, 0.16)]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={StyleSheet.absoluteFill}
             />
-            <View style={[styles.row, { gap: spacing.sm, padding: spacing.md }]}>
+            <View
+              style={[
+                styles.row,
+                { gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+              ]}>
               <Icon name="lightbulb.fill" fallback="bulb" size={24} color={colors.warning} />
-              <AppText variant="footnote" style={styles.flex}>
+              <AppText variant="footnote" style={[styles.flex, styles.strong]}>
                 解約すると年間 約{formatMoney(savings.amount)}の{'\n'}節約になる可能性があります。
               </AppText>
               <Icon
@@ -138,6 +143,7 @@ export default function ReviewScreen() {
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center' },
   flex: { flex: 1 },
+  strong: { fontWeight: '600' },
   separator: { position: 'absolute', right: 0, bottom: 0 },
   savings: { overflow: 'hidden' },
 });

@@ -24,6 +24,8 @@ type Props = {
 const AXIS_WIDTH = 44;
 const LABEL_HEIGHT = 22;
 const BUBBLE_HEIGHT = 26;
+/** 吹き出しの下向きの三角 */
+const POINTER = 5;
 const GROW_MS = 600;
 
 /** 上端だけ角丸の棒 */
@@ -52,7 +54,7 @@ export function BarChart({
 
   const ticks = niceTicks(Math.max(0, ...bars.map((b) => b.value)));
   const top = ticks[ticks.length - 1];
-  const plotTop = BUBBLE_HEIGHT + 8;
+  const plotTop = BUBBLE_HEIGHT + POINTER + 8;
   const plotHeight = height - plotTop - LABEL_HEIGHT;
   const plotWidth = Math.max(0, width - AXIS_WIDTH);
   const slot = bars.length > 0 ? plotWidth / bars.length : 0;
@@ -68,6 +70,22 @@ export function BarChart({
 
   return (
     <View style={[{ height }, style]} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+      {/* 今月の棒にだけ弱い発光（SVG は影を持てないので同じ形の View を下に敷く） */}
+      {highlighted && width > 0 && highlighted.value > 0 ? (
+        <View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            left: hx - barWidth / 2,
+            top: hy,
+            width: barWidth,
+            height: Math.max(0, plotTop + plotHeight - hy),
+            borderTopLeftRadius: 7,
+            borderTopRightRadius: 7,
+            boxShadow: accent.glow,
+          }}
+        />
+      ) : null}
       {width > 0 ? (
         <Svg width={width} height={height}>
           <Defs>
@@ -139,17 +157,31 @@ export function BarChart({
       {highlighted && width > 0 && highlighted.value > 0 ? (
         <View
           pointerEvents="none"
-          style={[styles.bubbleWrap, { left: hx - 60, top: Math.max(0, hy - BUBBLE_HEIGHT - 6) }]}>
-          <View style={styles.bubble}>
+          style={[
+            styles.bubbleWrap,
+            { left: hx - 60, top: Math.max(0, hy - BUBBLE_HEIGHT - POINTER - 4) },
+          ]}>
+          <View style={[styles.bubbleGlow, { boxShadow: accent.glow }]}>
+            <View style={styles.bubble}>
+              <ViewGradient
+                colors={accent.gradient}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <AppText variant="caption" style={{ color: colors.onAccent, fontWeight: '700' }}>
+                {formatValue(highlighted.value)}
+              </AppText>
+            </View>
+          </View>
+          {/* 下向きの三角（回転した正方形の下半分。色はグラデーションの中央） */}
+          <View style={styles.pointer}>
             <ViewGradient
               colors={accent.gradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 1, y: 0 }}
               style={StyleSheet.absoluteFill}
             />
-            <AppText variant="caption" style={{ color: colors.onAccent, fontWeight: '700' }}>
-              {formatValue(highlighted.value)}
-            </AppText>
           </View>
         </View>
       ) : null}
@@ -176,6 +208,15 @@ const styles = StyleSheet.create({
   tick: { position: 'absolute', left: 0, textAlign: 'right', fontVariant: ['tabular-nums'] },
   xLabel: { position: 'absolute', textAlign: 'center' },
   bubbleWrap: { position: 'absolute', width: 120, alignItems: 'center' },
+  bubbleGlow: { borderRadius: 999 },
+  pointer: {
+    width: POINTER * 2,
+    height: POINTER * 2,
+    marginTop: -POINTER - 1,
+    overflow: 'hidden',
+    transform: [{ rotate: '45deg' }],
+    zIndex: -1,
+  },
   bubble: {
     height: BUBBLE_HEIGHT,
     paddingHorizontal: 10,

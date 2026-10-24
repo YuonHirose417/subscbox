@@ -1,16 +1,17 @@
 import { MenuView } from '@expo/ui/community/menu';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
+import Svg, { Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText, Icon, IconButton } from '@/components/ui';
 import type { Subscription } from '@/domain/types';
 import { ja } from '@/i18n/ja';
-import { useTheme } from '@/theme';
+import { useCategories } from '@/features/categories/store';
+import { useTheme, withAlpha } from '@/theme';
 
-import { ServiceIcon } from './ServiceIcon';
+import { brandColorOf, ServiceIcon } from './ServiceIcon';
 
 export type DetailMenuAction = { id: string; title: string; destructive?: boolean };
 
@@ -23,25 +24,37 @@ type Props = {
 const HEADER_HEIGHT = 300;
 
 /**
- * 詳細画面のヘッダー。サービスアイコンを大きく拡大して強くぼかし、濃紺〜黒の半透明グラデーションを
- * 重ねて暗いトーンの背景を作る（他社のコンテンツ画像は使わない）。下端は背景色に溶かす。
+ * 詳細画面のヘッダー。紺〜スレートの地に、ブランドカラーをぼかした光を淡く重ねる
+ * （他社のコンテンツ画像は使わない）。下端は背景色に溶かす。
  */
 export function DetailHeader({ subscription: sub, menuActions, onMenuAction }: Props) {
   const { colors, spacing, scheme } = useTheme();
   const insets = useSafeAreaInsets();
   const height = HEADER_HEIGHT + insets.top;
+  const categories = useCategories();
+  const brand = brandColorOf(sub, categories) ?? colors.textTertiary;
 
   return (
     <View style={{ height }}>
       <View
-        style={[StyleSheet.absoluteFill, styles.backdrop, { backgroundColor: colors.scrim[1] }]}>
-        <View style={styles.bigIcon} importantForAccessibility="no-hide-descendants">
-          <ServiceIcon subscription={sub} size={420} />
-        </View>
-        <BlurView intensity={90} tint="dark" style={StyleSheet.absoluteFill} />
+        pointerEvents="none"
+        style={[StyleSheet.absoluteFill, { backgroundColor: colors.headerBase }]}>
+        <Svg style={StyleSheet.absoluteFill} viewBox="0 0 400 360" preserveAspectRatio="none">
+          <Defs>
+            <RadialGradient id="brandGlow" cx="50%" cy="50%" rx="50%" ry="50%">
+              <Stop offset="0" stopColor={brand} stopOpacity={0.3} />
+              <Stop offset="1" stopColor={brand} stopOpacity={0} />
+            </RadialGradient>
+          </Defs>
+          <Ellipse cx={200} cy={150} rx={240} ry={170} fill="url(#brandGlow)" />
+        </Svg>
         <LinearGradient
-          colors={[colors.scrim[0], colors.scrim[1], colors.background]}
-          locations={[0, 0.72, 1]}
+          colors={[
+            withAlpha(colors.headerBase, 0),
+            withAlpha(colors.headerBase, 0.6),
+            colors.background,
+          ]}
+          locations={[0, 0.62, 1]}
           style={StyleSheet.absoluteFill}
         />
       </View>
@@ -86,7 +99,7 @@ export function DetailHeader({ subscription: sub, menuActions, onMenuAction }: P
       <View style={[styles.identity, { gap: spacing.xxs }]}>
         <ServiceIcon subscription={sub} size={72} />
         <AppText
-          variant="title"
+          variant="largeTitle"
           numberOfLines={1}
           accessibilityRole="header"
           style={[styles.name, { color: colors.onAccent, marginTop: spacing.sm }]}>
@@ -106,8 +119,6 @@ export function DetailHeader({ subscription: sub, menuActions, onMenuAction }: P
 }
 
 const styles = StyleSheet.create({
-  backdrop: { overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
-  bigIcon: { opacity: 0.55, transform: [{ rotate: '-8deg' }] },
   toolbar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   more: {
     width: 40,

@@ -57,7 +57,7 @@ export default function CurrencyScreen() {
         <AppText variant="footnote" tone="secondary">
           外貨のサブスクは、ここで入力したレートで円に換算して合計します。為替レートは自動では取得しません（外部と通信しません）。未入力の通貨は合計から除外されます。
         </AppText>
-        <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+        <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
           {ordered.map((code, index) => (
             <FormRow
               key={code}

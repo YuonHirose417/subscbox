@@ -7,7 +7,6 @@ import { useSettingsStore } from '@/features/settings/store';
 
 import {
   accentPresets,
-  accentShadow,
   categoryColors,
   motion,
   palettes,
@@ -29,7 +28,6 @@ export type Theme = {
   spacing: typeof spacing;
   radius: typeof radius;
   shadow: string | undefined;
-  accentShadow: string | undefined;
   motion: typeof motion & { easing: EasingFunction };
   sizes: typeof sizes;
   typography: typeof typography;
@@ -58,7 +56,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       spacing,
       radius,
       shadow: shadows[scheme],
-      accentShadow: accentShadow[scheme],
       motion: themeMotion,
       sizes,
       typography,

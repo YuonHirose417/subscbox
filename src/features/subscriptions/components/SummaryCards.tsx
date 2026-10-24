@@ -41,7 +41,13 @@ function SummaryCard({
 }) {
   const { spacing, colors, accent, radius } = useTheme();
   return (
-    <Card variant="inner" style={[styles.card, { gap: spacing.sm, padding: spacing.sm }]}>
+    // 高さはカンプ実測 75pt
+    <Card
+      variant="inner"
+      style={[
+        styles.card,
+        { gap: spacing.sm, paddingHorizontal: spacing.sm, paddingVertical: 18 },
+      ]}>
       <View
         style={[styles.iconTile, { backgroundColor: colors.infoSoft, borderRadius: radius.icon }]}>
         <Icon name={icon} fallback={fallback} size={20} color={accent.primary} />

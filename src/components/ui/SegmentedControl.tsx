@@ -26,7 +26,7 @@ const TRACK_PADDING = 3;
 
 /** ピル型トラック上を、選択中のグラデーションピルが 220ms でスライドする */
 export function SegmentedControl<T extends string>({ options, value, onChange, style }: Props<T>) {
-  const { colors, accent, radius, motion } = useTheme();
+  const { colors, accent, radius, motion, sizes } = useTheme();
   const reducedMotion = useReducedMotion();
   const [trackWidth, setTrackWidth] = useState(0);
   const index = Math.max(
@@ -57,6 +57,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange, s
           backgroundColor: colors.surfaceSecondary,
           borderRadius: radius.pill,
           padding: TRACK_PADDING,
+          minHeight: sizes.segmentHeight,
         },
         style,
       ]}>
@@ -70,15 +71,19 @@ export function SegmentedControl<T extends string>({ options, value, onChange, s
               bottom: TRACK_PADDING,
               left: TRACK_PADDING,
               borderRadius: radius.pill,
+              // 選択中のピルにだけ弱い発光
+              boxShadow: accent.glow,
             },
             pillStyle,
           ]}>
-          <LinearGradient
-            colors={accent.gradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
+          <View style={[styles.pillFill, { borderRadius: radius.pill }]}>
+            <LinearGradient
+              colors={accent.gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={StyleSheet.absoluteFill}
+            />
+          </View>
         </Animated.View>
       ) : null}
       {options.map((option) => {
@@ -96,9 +101,10 @@ export function SegmentedControl<T extends string>({ options, value, onChange, s
             }}
             style={styles.segment}>
             <AppText
-              variant="footnote"
+              variant="label"
               style={{
-                fontWeight: selected ? '600' : '500',
+                fontSize: 13,
+                fontWeight: selected ? '700' : '500',
                 color: selected ? colors.onAccent : colors.textSecondary,
               }}>
               {option.label}
@@ -111,7 +117,8 @@ export function SegmentedControl<T extends string>({ options, value, onChange, s
 }
 
 const styles = StyleSheet.create({
-  track: { flexDirection: 'row', minHeight: 38 },
-  pill: { position: 'absolute', overflow: 'hidden' },
-  segment: { flex: 1, minHeight: 32, alignItems: 'center', justifyContent: 'center' },
+  track: { flexDirection: 'row' },
+  pill: { position: 'absolute' },
+  pillFill: { flex: 1, overflow: 'hidden' },
+  segment: { flex: 1, minHeight: 30, alignItems: 'center', justifyContent: 'center' },
 });

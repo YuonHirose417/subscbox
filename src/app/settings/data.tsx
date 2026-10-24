@@ -105,7 +105,7 @@ export default function DataSettingsScreen() {
     <Screen contentStyle={{ gap: spacing.md }}>
       <ScreenHeader showBack title="データのバックアップ" />
 
-      <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+      <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
         <ListRow
           icon="square.and.arrow.up"
           title="データを書き出す"
@@ -127,7 +127,7 @@ export default function DataSettingsScreen() {
       </AppText>
 
       <SectionHeader title="CSVで書き出す" />
-      <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+      <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
         <ListRow
           icon="tablecells"
           title="サブスク一覧"
@@ -155,7 +155,7 @@ export default function DataSettingsScreen() {
         {isPremium ? '' : 'CSVの書き出しはプレミアムプランの機能です。'}
       </AppText>
 
-      <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+      <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
         <ListRow
           icon="yensign.circle"
           title="外貨の為替レート"
@@ -164,7 +164,7 @@ export default function DataSettingsScreen() {
         />
       </Card>
 
-      <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+      <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
         <ListRow
           icon="trash"
           title="すべてのデータを削除"

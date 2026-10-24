@@ -40,7 +40,7 @@ export default function SettingsScreen() {
   return (
     <Screen>
       <ScreenHeader showBack title={ja.screens.settings.title} />
-      <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+      <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
         <ListRow
           icon="bell"
           title={t.notifications}
@@ -67,7 +67,7 @@ export default function SettingsScreen() {
           onPress={() => router.push('/paywall')}
         />
       </Card>
-      <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+      <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
         <ListRow
           icon="questionmark.circle"
           title={t.faq}
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
         <ListRow icon="envelope" title={t.contact} onPress={openContact} />
       </Card>
       {__DEV__ ? (
-        <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
+        <Card variant="inner" padding={0} style={{ paddingHorizontal: spacing.md }}>
           <ListRow
             icon="paintpalette"
             title={t.devCatalog}

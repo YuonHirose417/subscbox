@@ -20,14 +20,14 @@ import { ModalHeader } from '@/features/subscriptions/components/ModalHeader';
 import { ServiceIcon } from '@/features/subscriptions/components/ServiceIcon';
 import { PresetRow } from '@/features/subscriptions/components/PresetRow';
 import { presetIconSubject, searchPresets } from '@/features/subscriptions/presets';
-import { useTheme, withAlpha } from '@/theme';
+import { shade, useTheme, withAlpha } from '@/theme';
 
 /** カンプの「カテゴリから探す」の表示名（カテゴリ名と異なるもの） */
 const BROWSE_LABELS: Record<string, string> = { cloud: 'クラウドストレージ' };
 
 /** サブスクを追加：サービス選択（人気／検索／カテゴリ） */
 export default function AddServiceScreen() {
-  const { spacing, colors } = useTheme();
+  const { spacing, colors, scheme } = useTheme();
   const insets = useSafeAreaInsets();
   const categories = useCategories();
   const [query, setQuery] = useState('');
@@ -89,7 +89,10 @@ export default function AddServiceScreen() {
                     onPress={() => openPreset(preset)}
                     style={[styles.gridItem, { gap: spacing.xs, paddingVertical: spacing.xs }]}>
                     <ServiceIcon subscription={presetIconSubject(preset)} size={52} />
-                    <AppText variant="caption" numberOfLines={1} style={styles.center}>
+                    <AppText
+                      variant="label"
+                      numberOfLines={1}
+                      style={[styles.center, styles.medium]}>
                       {preset.shortName ?? preset.name}
                     </AppText>
                   </PressableScale>
@@ -124,14 +127,21 @@ export default function AddServiceScreen() {
                       <Icon
                         name={c.icon as IconName}
                         fallback="pricetag"
-                        size={22}
+                        size={24}
                         color={c.color}
                       />
                       <AppText
                         variant="footnote"
                         numberOfLines={1}
                         adjustsFontSizeToFit
-                        style={[styles.flex, { color: c.color, fontWeight: '600' }]}>
+                        style={[
+                          styles.flex,
+                          // ライトは淡い面の上で読めるよう同系色を少し濃くする
+                          {
+                            color: scheme === 'dark' ? c.color : shade(c.color, 0.3),
+                            fontWeight: '600',
+                          },
+                        ]}>
                         {BROWSE_LABELS[c.id] ?? c.name}
                       </AppText>
                     </PressableScale>
@@ -157,6 +167,7 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   flex: { flex: 1 },
   center: { textAlign: 'center' },
+  medium: { fontWeight: '500' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },
   gridItem: { width: '25%', alignItems: 'center', paddingHorizontal: 4 },
   tiles: { flexDirection: 'row', flexWrap: 'wrap' },
@@ -167,7 +178,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 16,
     borderCurve: 'continuous',
-    minHeight: 60,
+    minHeight: 64,
   },
   customRow: { flexDirection: 'row', alignItems: 'center' },
   plus: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
