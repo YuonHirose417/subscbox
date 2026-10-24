@@ -1,3 +1,4 @@
+import type { Subscription } from '@/domain/types';
 import { AppError } from '@/utils/errors';
 
 /** 無料版の上限値。変更はここだけで行う */
@@ -9,6 +10,17 @@ export const FREE_LIMITS = {
   /** 支払い方法の登録数 */
   paymentMethods: 2,
 } as const;
+
+/** 無料版の登録上限に達しているか（契約中のサブスクの数で数える。解約済みは履歴なので含めない） */
+export function reachedSubscriptionLimit(
+  items: readonly Pick<Subscription, 'status'>[],
+  isPremium: boolean,
+): boolean {
+  if (isPremium) return false;
+  return items.filter((s) => s.status === 'active').length >= FREE_LIMITS.subscriptions;
+}
+
+export const SUBSCRIPTION_LIMIT_REASON = `無料版で登録できるサブスクは${FREE_LIMITS.subscriptions}件までです。プレミアムプランなら無制限に登録できます。`;
 
 /** プレミアムで解放される機能 */
 export type PremiumFeature =

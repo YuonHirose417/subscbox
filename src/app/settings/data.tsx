@@ -16,6 +16,7 @@ import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore } from '@/features/settings/store';
 import { useTheme } from '@/theme';
 import { logger } from '@/utils/logger';
+import { openPaywall } from '@/features/premium/gate';
 
 type Busy = 'export' | 'csv' | 'restore' | 'delete' | null;
 
@@ -135,7 +136,7 @@ export default function DataSettingsScreen() {
           onPress={() =>
             isPremium
               ? run('csv', () => exportCsv('subscriptions'), '書き出せませんでした')
-              : router.push('/paywall')
+              : openPaywall('CSVの書き出しは、プレミアムプランの機能です。')
           }
         />
         <ListRow
@@ -145,7 +146,7 @@ export default function DataSettingsScreen() {
           onPress={() =>
             isPremium
               ? run('csv', () => exportCsv('payments'), '書き出せませんでした')
-              : router.push('/paywall')
+              : openPaywall('CSVの書き出しは、プレミアムプランの機能です。')
           }
         />
       </Card>

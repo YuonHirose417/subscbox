@@ -5,11 +5,15 @@ import type {
   PurchaseResult,
 } from './PremiumService';
 
+const DEV_PACKAGE_ID = '$rc_lifetime';
+
 /**
- * フェーズ7まで使うモック。購入は「準備中」として常にエラーを返す。
- * 開発中は setPremiumForDev() でプレミアム状態を切り替えて機能制限を確認する。
+ * RevenueCat を使えない環境（Expo Go・API キー未設定・Web）での実装。
+ * 開発中（__DEV__）は購入の流れを試せるよう、テスト用の買い切り商品を返し、購入するとプレミアムになる。
+ * 本番ビルドで使われた場合は商品を返さず、ペイウォールは「ストアに接続できません」を表示する。
  */
 export class MockPremiumService implements PremiumService {
+  readonly kind = 'mock' as const;
   private isPremium = false;
   private listeners = new Set<(isPremium: boolean) => void>();
 
@@ -20,11 +24,23 @@ export class MockPremiumService implements PremiumService {
   }
 
   async getOfferings(): Promise<PremiumOffering[]> {
-    return [];
+    if (!__DEV__) return [];
+    return [
+      {
+        packageId: DEV_PACKAGE_ID,
+        title: 'プレミアム（買い切り・テスト）',
+        priceString: '¥—（テスト）',
+        period: 'lifetime',
+      },
+    ];
   }
 
-  async purchase(): Promise<PurchaseResult> {
-    return { status: 'error', message: '準備中です' };
+  async purchase(packageId: string): Promise<PurchaseResult> {
+    if (!__DEV__ || packageId !== DEV_PACKAGE_ID) {
+      return { status: 'error', message: 'ストアに接続できませんでした。' };
+    }
+    this.setPremiumForDev(true);
+    return { status: 'success', isPremium: true };
   }
 
   async restore(): Promise<{ isPremium: boolean }> {

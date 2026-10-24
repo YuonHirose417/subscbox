@@ -35,6 +35,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-router',
     // ローカル通知のみ使う（プッシュ通知は使わないので APNs の entitlement を付けない）
     ['expo-notifications', { enableRemoteNotifications: false }],
+    // 広告（無料版のみ・非パーソナライズ。ATT は使わないので userTrackingUsageDescription は設定しない）
+    [
+      'react-native-google-mobile-ads',
+      {
+        // 未設定時は Google のテスト用アプリ ID（本番では EAS の環境変数に本物を設定する）
+        iosAppId:
+          process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID || 'ca-app-pub-3940256099942544~1458002511',
+        androidAppId: 'ca-app-pub-3940256099942544~3347511713',
+        // 同意の確認より前に計測を始めない
+        delayAppMeasurementInit: true,
+        // Google の SKAdNetwork ID（他の広告ネットワークを使う場合は追加する）
+        skAdNetworkItems: ['cstr6suwn9.skadnetwork'],
+      },
+    ],
     // アイコン画像（プレミアム）の選択。写真ライブラリからの選択のみでカメラ・マイクは使わない
     [
       'expo-image-picker',

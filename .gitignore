@@ -44,3 +44,6 @@ example
 
 # test coverage
 coverage/
+
+# ローカルの環境変数（値は .env.example を参照）
+.env

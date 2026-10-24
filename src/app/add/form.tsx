@@ -5,6 +5,9 @@ import { KeyboardAvoidingView, Platform } from 'react-native';
 import { Screen } from '@/components/ui';
 import { popularServicesByKey } from '@/data/popularServices';
 import { today as todayString } from '@/domain/dates';
+import { reachedSubscriptionLimit, SUBSCRIPTION_LIMIT_REASON } from '@/features/premium/gate';
+import { LimitReachedError } from '@/features/premium/limits';
+import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore } from '@/features/settings/store';
 import { ModalHeader } from '@/features/subscriptions/components/ModalHeader';
 import { valuesForCustom, valuesFromPreset } from '@/features/subscriptions/form/formValues';
@@ -22,6 +25,7 @@ export default function AddFormScreen() {
   const navigation = useNavigation();
   const { spacing } = useTheme();
   const createSubscription = useSubscriptionStore((s) => s.create);
+  const { isPremium } = usePremium();
   const notificationDefaults = useSettingsStore((s) => s.notificationDefaults);
   const [today] = useState(todayString);
 
@@ -56,6 +60,10 @@ export default function AddFormScreen() {
           submitLabel="保存する"
           today={today}
           onSubmit={async (input) => {
+            // 追加画面を開いたあとに上限に達した場合の保険（通常は開く前にペイウォールを出す）
+            if (reachedSubscriptionLimit(useSubscriptionStore.getState().items, isPremium)) {
+              throw new LimitReachedError(SUBSCRIPTION_LIMIT_REASON);
+            }
             await createSubscription(input);
             // 追加モーダル全体を閉じる（親のルートスタックで戻る）
             navigation.getParent()?.goBack();

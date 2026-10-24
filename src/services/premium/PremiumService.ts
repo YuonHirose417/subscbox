@@ -11,10 +11,17 @@ export type PremiumOffering = {
 export type PurchaseResult =
   | { status: 'success'; isPremium: boolean }
   | { status: 'cancelled' }
+  /** 保護者の承認待ちなど。承認されると onStatusChange で通知される */
+  | { status: 'pending' }
   | { status: 'error'; message: string };
 
-/** 本アプリ自身のプレミアムプランの課金管理（フェーズ7で RevenueCat 実装に差し替え） */
+/**
+ * 本アプリ自身のプレミアムプランの課金管理。
+ * 実装は RevenueCat（本番・development build）と Mock（Expo Go・キー未設定・Web）の2つ。
+ */
 export interface PremiumService {
+  /** 'revenuecat' | 'mock'（開発用の表示に使う） */
+  readonly kind: 'revenuecat' | 'mock';
   initialize(): Promise<void>;
   getStatus(): Promise<PremiumStatus>;
   getOfferings(): Promise<PremiumOffering[]>;

@@ -6,9 +6,11 @@ import { setCategoryRepository, useCategoryStore } from '@/features/categories/s
 import { setPaymentMethodRepository, usePaymentMethodStore } from '@/features/paymentMethods/store';
 import { startNotificationSync } from '@/features/notifications/sync';
 import { startPaymentSync } from '@/features/payments/store';
+import { ensureSubscribed } from '@/features/premium/usePremium';
 import { hydrateSettings } from '@/features/settings/store';
 import { removeUnusedIconImages } from '@/features/subscriptions/iconImages';
 import { setSubscriptionRepository, useSubscriptionStore } from '@/features/subscriptions/store';
+import { premiumService } from '@/services/premium';
 import { logger } from '@/utils/logger';
 
 export type InitStatus = 'loading' | 'ready' | 'error';
@@ -26,6 +28,9 @@ export function useAppInit(): { status: InitStatus; retry: () => void } {
     let cancelled = false;
     (async () => {
       try {
+        // 課金の初期化は通信を伴うので待たない（購入状態は届きしだい反映される）
+        premiumService.initialize().catch((e) => logger.error('premium init', e));
+        ensureSubscribed();
         const repos = await initRepositories();
         setSubscriptionRepository(repos.subscriptions);
         setCategoryRepository(repos.categories);

@@ -30,7 +30,7 @@ import { useSubscriptionStore } from '@/features/subscriptions/store';
 import { clearSubscriptionsForDev, seedManyForDev, seedSampleDataForDev } from '@/db/devTools';
 import { today as todayString } from '@/domain/dates';
 import { ja } from '@/i18n/ja';
-import { premiumService } from '@/services/premium';
+import { MockPremiumService, premiumService } from '@/services/premium';
 import { setDevDayOffset, useClockStore } from '@/utils/clock';
 import { accentPresets, useTheme, withAlpha, type AccentPresetId } from '@/theme';
 import type { TypographyVariant } from '@/theme/typography';
@@ -98,12 +98,19 @@ export default function CatalogScreen() {
           onChange={setThemePreference}
         />
         <ListRow
-          title="プレミアム（Mock）"
+          title={
+            premiumService.kind === 'mock'
+              ? 'プレミアム（Mock）'
+              : 'プレミアム（RevenueCat・切替不可）'
+          }
           trailing={
             <Toggle
               value={isPremium}
               accessibilityLabel="プレミアム（Mock）"
-              onValueChange={(v) => premiumService.setPremiumForDev(v)}
+              onValueChange={(v) => {
+                if (premiumService instanceof MockPremiumService)
+                  premiumService.setPremiumForDev(v);
+              }}
             />
           }
         />

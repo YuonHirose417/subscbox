@@ -31,6 +31,7 @@ import { useSettingsStore } from '@/features/settings/store';
 import { useTheme } from '@/theme';
 import { isAppError } from '@/utils/errors';
 import { logger } from '@/utils/logger';
+import { openPaywall } from '@/features/premium/gate';
 
 import {
   dateToTime,
@@ -127,8 +128,7 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
   };
 
   const requirePremium = () =>
-    Alert.alert(
-      'プレミアムプランの機能です',
+    openPaywall(
       `無料版では、すべてのサブスクに通知の全体設定（${notifyDaysLabel(notificationDefaults.daysBefore)} ${notificationDefaults.time}）が適用されます。サブスクごとの設定はプレミアムプランで利用できます。`,
     );
 
@@ -144,10 +144,7 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
 
   const chooseIconImage = () => {
     if (!isPremium) {
-      Alert.alert(
-        'プレミアムプランの機能です',
-        'アイコンに好きな画像を設定できるのは、プレミアムプランの機能です。',
-      );
+      openPaywall('アイコンに好きな写真を設定できるのは、プレミアムプランの機能です。');
       return;
     }
     if (!values.iconImage) {

@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui';
 import { useCategories } from '@/features/categories/store';
 import { usePremium } from '@/features/premium/usePremium';
+import { InlineBanner } from '@/features/ads/InlineBanner';
 import { useSettingsStore } from '@/features/settings/store';
 import { SORT_LABELS, showSortMenu } from '@/features/subscriptions/components/sortMenu';
 import { SubscriptionRow } from '@/features/subscriptions/components/SubscriptionRow';
@@ -26,6 +27,11 @@ import { useToday } from '@/features/subscriptions/hooks/useToday';
 import { useSubscriptionStore } from '@/features/subscriptions/store';
 import { ja } from '@/i18n/ja';
 import { useTheme } from '@/theme';
+import {
+  openPaywall,
+  reachedSubscriptionLimit,
+  SUBSCRIPTION_LIMIT_REASON,
+} from '@/features/premium/gate';
 
 export default function SubscriptionsScreen() {
   const { spacing, colors, radius } = useTheme();
@@ -44,7 +50,10 @@ export default function SubscriptionsScreen() {
   const [includeCancelled, setIncludeCancelled] = useState(false);
   const { items, sortOrder } = useSubscriptionList({ query, categoryId, includeCancelled });
 
-  const openAdd = () => router.push('/add');
+  const openAdd = () =>
+    reachedSubscriptionLimit(useSubscriptionStore.getState().items, isPremium)
+      ? openPaywall(SUBSCRIPTION_LIMIT_REASON)
+      : router.push('/add');
   const clearFilters = () => {
     setQuery('');
     setCategoryId(null);
@@ -58,10 +67,7 @@ export default function SubscriptionsScreen() {
       onSort: setSortOrder,
       onToggleCancelled: () => setIncludeCancelled((v) => !v),
       onRequirePremium: () =>
-        Alert.alert(
-          'プレミアムプランの機能です',
-          '更新日順・金額順などの並び替えは、プレミアムプランで利用できます。',
-        ),
+        openPaywall('更新日順・金額順などの並び替えは、プレミアムプランで利用できます。'),
     });
 
   return (
@@ -135,6 +141,13 @@ export default function SubscriptionsScreen() {
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          ListFooterComponent={
+            items.length > 0 ? (
+              <View style={{ paddingHorizontal: spacing.screen, paddingTop: spacing.md }}>
+                <InlineBanner />
+              </View>
+            ) : undefined
+          }
           ListEmptyComponent={
             query || categoryId ? (
               <EmptyState

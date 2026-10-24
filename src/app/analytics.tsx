@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { BarChart } from '@/components/charts/BarChart';
 import {
@@ -20,6 +20,7 @@ import { formatMinor, formatMoney } from '@/domain/money';
 import { reviewCandidates } from '@/domain/review';
 import type { TrendPoint } from '@/domain/trend';
 import type { Period } from '@/domain/types';
+import { InlineBanner } from '@/features/ads/InlineBanner';
 import { BreakdownSheet } from '@/features/analytics/components/BreakdownSheet';
 import { useAnalytics } from '@/features/analytics/hooks/useAnalytics';
 import { usePremium } from '@/features/premium/usePremium';
@@ -29,6 +30,7 @@ import { useToday } from '@/features/subscriptions/hooks/useToday';
 import { useSubscriptionStore } from '@/features/subscriptions/store';
 import { ja } from '@/i18n/ja';
 import { useTheme } from '@/theme';
+import { openPaywall } from '@/features/premium/gate';
 
 const PERIODS = [
   { value: 'month', label: ja.period.month },
@@ -210,13 +212,12 @@ export default function AnalyticsScreen() {
           onPress={() =>
             isPremium
               ? router.push('/calendar')
-              : Alert.alert(
-                  'プレミアムプランの機能です',
-                  'カレンダーで支払い履歴を確認できるのは、プレミアムプランの機能です。',
-                )
+              : openPaywall('カレンダーで支払い履歴を確認できるのは、プレミアムプランの機能です。')
           }
         />
       </Card>
+
+      <InlineBanner />
 
       <BreakdownSheet point={selected} onClose={() => setSelected(null)} />
     </Screen>

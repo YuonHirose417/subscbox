@@ -2,7 +2,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText, Card, Screen, ScreenHeader } from '@/components/ui';
-import { licenses, privacyPolicy, termsOfUse, type Section } from '@/data/legal';
+import { LEGAL_UPDATED_AT, licenses, privacyPolicy, termsOfUse, type Section } from '@/data/legal';
 import { useTheme } from '@/theme';
 
 const DOCS: Record<string, { title: string; sections: readonly Section[] }> = {
@@ -50,6 +50,9 @@ export default function LegalScreen() {
   return (
     <Screen contentStyle={{ gap: spacing.md }}>
       <ScreenHeader showBack title={page.title} />
+      <AppText variant="footnote" tone="secondary">
+        制定日・最終改定日：{LEGAL_UPDATED_AT}
+      </AppText>
       <Card style={{ gap: spacing.md }}>
         {page.sections.map((s) => (
           <View key={s.heading} style={{ gap: spacing.xxs }}>

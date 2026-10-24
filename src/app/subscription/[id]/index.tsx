@@ -52,6 +52,11 @@ import { useSubscriptionStore } from '@/features/subscriptions/store';
 import { useTheme, withAlpha } from '@/theme';
 import { isAppError } from '@/utils/errors';
 import { logger } from '@/utils/logger';
+import {
+  openPaywall,
+  reachedSubscriptionLimit,
+  SUBSCRIPTION_LIMIT_REASON,
+} from '@/features/premium/gate';
 
 /** 「月額料金」「年額料金」「週額料金」「料金（3か月ごと）」 */
 function priceLabel(cycle: BillingCycle): string {
@@ -143,12 +148,15 @@ function Detail({ sub }: { sub: Subscription }) {
     );
 
   const requirePremium = () =>
-    Alert.alert(
-      'プレミアムプランの機能です',
-      `無料版では、すべてのサブスクに通知の全体設定（${notifyDaysLabel(notificationDefaults.daysBefore)} ${notificationDefaults.time}）が適用されます。`,
+    openPaywall(
+      `無料版では、すべてのサブスクに通知の全体設定（${notifyDaysLabel(notificationDefaults.daysBefore)} ${notificationDefaults.time}）が適用されます。サブスクごとの設定はプレミアムプランで利用できます。`,
     );
 
   const duplicate = async () => {
+    if (reachedSubscriptionLimit(useSubscriptionStore.getState().items, isPremium)) {
+      openPaywall(SUBSCRIPTION_LIMIT_REASON);
+      return;
+    }
     try {
       const copy = await store().duplicate(sub.id);
       router.replace({ pathname: '/subscription/[id]', params: { id: copy.id } });
@@ -176,6 +184,10 @@ function Detail({ sub }: { sub: Subscription }) {
         ],
       );
     } else if (action === 'reactivate') {
+      if (reachedSubscriptionLimit(useSubscriptionStore.getState().items, isPremium)) {
+        openPaywall(SUBSCRIPTION_LIMIT_REASON);
+        return;
+      }
       store()
         .reactivate(sub.id)
         .catch((e) => logger.error('reactivate failed', e));
@@ -394,10 +406,7 @@ function Detail({ sub }: { sub: Subscription }) {
               onPress={() =>
                 isPremium
                   ? router.push({ pathname: '/subscription/[id]/payments', params: { id: sub.id } })
-                  : Alert.alert(
-                      'プレミアムプランの機能です',
-                      '過去の支払い履歴の確認・修正は、プレミアムプランで利用できます。',
-                    )
+                  : openPaywall('過去の支払い履歴の確認・修正は、プレミアムプランで利用できます。')
               }
             />
           </Card>

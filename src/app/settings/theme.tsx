@@ -1,5 +1,4 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
 import { AppText, Card, Icon, ListRow, Screen, ScreenHeader, SectionHeader } from '@/components/ui';
@@ -7,6 +6,7 @@ import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore, type ThemePreference } from '@/features/settings/store';
 import { ja } from '@/i18n/ja';
 import { accentPresets, useTheme, type AccentPresetId } from '@/theme';
+import { openPaywall } from '@/features/premium/gate';
 
 const THEMES: readonly ThemePreference[] = ['system', 'light', 'dark'];
 const PRESET_IDS = Object.keys(accentPresets) as AccentPresetId[];
@@ -84,7 +84,11 @@ export default function ThemeSettingsScreen() {
               }
               separator={i < PRESET_IDS.length - 1}
               accessibilityLabel={`${accentPresets[id].label}${selectedPreset === id ? '、選択中' : locked ? '、プレミアム' : ''}`}
-              onPress={() => (locked ? router.push('/paywall') : setAccentPreset(id))}
+              onPress={() =>
+                locked
+                  ? openPaywall('テーマカラーの変更は、プレミアムプランの機能です。')
+                  : setAccentPreset(id)
+              }
             />
           );
         })}

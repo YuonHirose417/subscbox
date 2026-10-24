@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ErrorState } from '@/components/ui';
+import { useAdsBootstrap } from '@/features/ads/useAdsBootstrap';
 import { useAppInit } from '@/features/app/useAppInit';
 import { useNotificationTap } from '@/features/notifications/useNotificationTap';
 import { configureNotificationHandler } from '@/services/notifications';
@@ -19,6 +20,7 @@ function RootStack() {
   const { colors, scheme } = useTheme();
   const { status, retry } = useAppInit();
   useNotificationTap(status === 'ready');
+  useAdsBootstrap(status === 'ready');
 
   useEffect(() => {
     if (status !== 'loading') SplashScreen.hideAsync().catch(() => {});

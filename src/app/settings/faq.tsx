@@ -3,11 +3,14 @@ import { router } from 'expo-router';
 import { AppText, Card, ListRow, Screen, ScreenHeader, SectionHeader } from '@/components/ui';
 import { APP_VERSION } from '@/constants/app';
 import { faqItems } from '@/data/legal';
+import { showAdPrivacyOptions, useAdsStore } from '@/services/ads';
 import { useTheme } from '@/theme';
+import { logger } from '@/utils/logger';
 
 /** よくある質問。末尾にプライバシーポリシー・利用規約・ライセンス・バージョン */
 export default function FaqScreen() {
   const { spacing } = useTheme();
+  const adPrivacyRequired = useAdsStore((s) => s.privacyOptionsRequired);
   return (
     <Screen contentStyle={{ gap: spacing.md }}>
       <ScreenHeader showBack title="よくある質問" />
@@ -48,6 +51,16 @@ export default function FaqScreen() {
             router.push({ pathname: '/settings/legal/[doc]', params: { doc: 'licenses' } })
           }
         />
+        {adPrivacyRequired ? (
+          <ListRow
+            icon="hand.raised"
+            title="広告のプライバシー設定"
+            separator
+            onPress={() =>
+              showAdPrivacyOptions().catch((e) => logger.error('ad privacy options failed', e))
+            }
+          />
+        ) : null}
         <ListRow icon="info.circle" title="バージョン" value={APP_VERSION} showChevron={false} />
       </Card>
       <AppText variant="caption" tone="tertiary">

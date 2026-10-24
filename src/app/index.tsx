@@ -27,6 +27,12 @@ import { useToday } from '@/features/subscriptions/hooks/useToday';
 import { useSubscriptionStore } from '@/features/subscriptions/store';
 import { ja } from '@/i18n/ja';
 import { useTheme } from '@/theme';
+import {
+  openPaywall,
+  reachedSubscriptionLimit,
+  SUBSCRIPTION_LIMIT_REASON,
+} from '@/features/premium/gate';
+import { usePremium } from '@/features/premium/usePremium';
 
 const PERIODS = [
   { value: 'month', label: ja.period.month },
@@ -47,7 +53,11 @@ export default function HomeScreen() {
   const today = useToday();
   const t = ja.screens.home;
 
-  const openAdd = () => router.push('/add');
+  const { isPremium } = usePremium();
+  const openAdd = () =>
+    reachedSubscriptionLimit(useSubscriptionStore.getState().items, isPremium)
+      ? openPaywall(SUBSCRIPTION_LIMIT_REASON)
+      : router.push('/add');
   const isEmpty = status === 'ready' && summary.activeCount === 0;
   const diff = Math.round(summary.monthOverMonth);
   const diffColor =
