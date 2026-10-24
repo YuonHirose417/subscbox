@@ -5,14 +5,15 @@ import { premiumService } from '@/services/premium';
 
 type PremiumState = { isPremium: boolean; setIsPremium: (value: boolean) => void };
 
-const usePremiumStore = create<PremiumState>((set) => ({
+export const usePremiumStore = create<PremiumState>((set) => ({
   isPremium: false,
   setIsPremium: (isPremium) => set({ isPremium }),
 }));
 
 let subscribed = false;
 
-function ensureSubscribed() {
+/** プレミアム状態の購読を始める（何度呼んでもよい） */
+export function ensureSubscribed() {
   if (subscribed) return;
   subscribed = true;
   premiumService.onStatusChange((value) => usePremiumStore.getState().setIsPremium(value));

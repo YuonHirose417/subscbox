@@ -1,5 +1,7 @@
 import { LATEST_VERSION, migrate } from '@/db/migrations';
 import { CategoryRepository } from '@/db/repositories/CategoryRepository';
+import { DataTransferRepository } from '@/db/repositories/DataTransferRepository';
+import { NotificationRepository } from '@/db/repositories/NotificationRepository';
 import { PaymentMethodRepository } from '@/db/repositories/PaymentMethodRepository';
 import { PaymentRepository } from '@/db/repositories/PaymentRepository';
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
@@ -22,6 +24,9 @@ async function setup() {
     categories: new CategoryRepository(db, generateId),
     paymentMethods: new PaymentMethodRepository(db, generateId),
     settings: new SettingsRepository(db),
+    payments: new PaymentRepository(db, generateId),
+    transfer: new DataTransferRepository(db),
+    notifications: new NotificationRepository(db),
   };
 }
 
@@ -138,5 +143,99 @@ run('PaymentRepository', () => {
     // サブスクを削除すると履歴も消える
     await subs.remove(sub.id);
     expect(await payments.listAll()).toHaveLength(0);
+  });
+});
+
+run('DataTransferRepository', () => {
+  async function seeded() {
+    const ctx = await setup();
+    const method = await ctx.paymentMethods.create({
+      type: 'credit_card',
+      label: null,
+      last4: '1234',
+    });
+    const category = await ctx.categories.create({ name: '自作', color: '#123456', icon: 'star' });
+    const sub = await ctx.subs.create(
+      toInput(
+        makeSub({
+          name: 'Netflix',
+          categoryId: category.id,
+          paymentMethodId: method.id,
+          startDate: '2025-01-15',
+          nextRenewalDate: '2025-10-15',
+        }),
+      ),
+    );
+    await ctx.subs.update(sub.id, { amountMinor: 1890 });
+    await ctx.payments.sync(
+      await ctx.subs.list({ status: 'all' }),
+      await ctx.subs.getPriceHistory(),
+      '2025-10-17',
+    );
+    const [first] = await ctx.payments.listAll();
+    await ctx.payments.edit(first.id, { amountMinor: 1000 });
+    await ctx.settings.set('themePreference', 'dark');
+    await ctx.settings.set('exchangeRates', { USD: 150 });
+    return ctx;
+  }
+
+  it('exports, deletes everything and restores the same data', async () => {
+    const { transfer, subs, categories } = await seeded();
+    const before = await transfer.exportAll();
+    expect(before.subscriptions).toHaveLength(1);
+    expect(before.payments.length).toBeGreaterThan(5);
+    expect(before.payments.some((p) => p.isUserEdited)).toBe(true);
+    expect(before.priceHistory.length).toBeGreaterThanOrEqual(2);
+
+    await transfer.deleteAll();
+    const empty = await transfer.exportAll();
+    expect(empty.subscriptions).toEqual([]);
+    expect(empty.payments).toEqual([]);
+    expect(empty.paymentMethods).toEqual([]);
+    expect(empty.settings).toEqual({});
+    expect((await categories.list()).map((c) => c.id)).toHaveLength(6);
+
+    await transfer.replaceAll(before);
+    expect(await transfer.exportAll()).toEqual(before);
+    expect(await subs.list({ status: 'all' })).toEqual(before.subscriptions);
+  });
+
+  it('rolls back when the restore fails', async () => {
+    const { transfer } = await seeded();
+    const before = await transfer.exportAll();
+    const broken = {
+      ...before,
+      subscriptions: [{ ...before.subscriptions[0], categoryId: 'missing' }],
+    };
+    await expect(transfer.replaceAll(broken)).rejects.toThrow();
+    expect(await transfer.exportAll()).toEqual(before);
+  });
+
+  it('adds missing default categories on restore', async () => {
+    const { transfer, categories } = await seeded();
+    const before = await transfer.exportAll();
+    await transfer.replaceAll({
+      ...before,
+      categories: before.categories.filter((c) => !c.isDefault || c.id === 'other'),
+    });
+    expect((await categories.list()).filter((c) => c.isDefault)).toHaveLength(6);
+  });
+});
+
+run('NotificationRepository', () => {
+  it('replaces the table, ignores unknown subscriptions and cascades on delete', async () => {
+    const { subs, notifications } = await setup();
+    const sub = await subs.create(toInput(makeSub()));
+    await notifications.replaceAll([
+      { notificationId: 'n1', subscriptionId: sub.id, fireAt: '2025-10-20T00:00:00.000Z' },
+      { notificationId: 'n2', subscriptionId: 'gone', fireAt: '2025-10-21T00:00:00.000Z' },
+    ]);
+    expect((await notifications.list()).map((n) => n.notificationId)).toEqual(['n1']);
+    await notifications.replaceAll([
+      { notificationId: 'n3', subscriptionId: sub.id, fireAt: '2025-11-20T00:00:00.000Z' },
+    ]);
+    expect((await notifications.list()).map((n) => n.notificationId)).toEqual(['n3']);
+    await subs.remove(sub.id);
+    expect(await notifications.list()).toEqual([]);
   });
 });

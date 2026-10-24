@@ -19,10 +19,12 @@ import {
 import { popularServicesByKey, type ServicePlanPreset } from '@/data/popularServices';
 import { parseDate, toDateString } from '@/domain/dates';
 import { currencies, currencyCodes, fromMinor } from '@/domain/money';
+import { effectiveNotification } from '@/domain/notifications';
 import { formatPaymentMethod } from '@/domain/paymentMethod';
 import type { CycleUnit, SubscriptionInput } from '@/domain/types';
 import { LIMITS } from '@/domain/validation';
 import { useCategories } from '@/features/categories/store';
+import { ensureNotificationPermission } from '@/features/notifications/permission';
 import { usePaymentMethodStore } from '@/features/paymentMethods/store';
 import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore } from '@/features/settings/store';
@@ -106,8 +108,13 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
     setSaving(true);
     try {
       // 無料版は通知の個別設定を変更させない（新規は全体設定の値、編集は元の値のまま）
-      await onSubmit(isPremium ? input : { ...input, notification: initialValues.notification });
+      const saved = isPremium ? input : { ...input, notification: initialValues.notification };
+      await onSubmit(saved);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      // 通知が有効な状態で初めて保存したときに、通知の許可を尋ねる
+      if (effectiveNotification(saved, notificationDefaults, isPremium).enabled) {
+        void ensureNotificationPermission();
+      }
     } catch (error) {
       logger.error('failed to save subscription', error);
       Alert.alert(

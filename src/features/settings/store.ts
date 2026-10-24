@@ -92,7 +92,8 @@ let unsubscribe: (() => void) | null = null;
 /** settings テーブルから読み込み、以後の変更を書き戻す */
 export async function hydrateSettings(repository: SettingsRepository): Promise<void> {
   const stored = sanitize(await repository.getAll());
-  useSettingsStore.setState(stored);
+  // 保存されていない項目は既定値に戻す（全削除・復元の後に読み直す場合のため）
+  useSettingsStore.setState({ ...DEFAULT_SETTINGS, ...stored });
   unsubscribe?.();
   unsubscribe = useSettingsStore.subscribe((state, prev) => {
     for (const key of PERSISTED_KEYS) {

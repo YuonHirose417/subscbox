@@ -22,6 +22,7 @@ import {
 } from '@/components/ui';
 import { BarChart } from '@/components/charts/BarChart';
 import { DonutChart } from '@/components/charts/DonutChart';
+import { DevNotificationTools } from '@/features/notifications/DevNotificationTools';
 import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore, type ThemePreference } from '@/features/settings/store';
 import { renewalBadgeTone } from '@/features/subscriptions/renewalBadge';
@@ -139,6 +140,10 @@ export default function CatalogScreen() {
             }
           />
         </View>
+      </Section>
+
+      <Section title="通知（開発用）">
+        <DevNotificationTools />
       </Section>
 
       <Section title="カラー">

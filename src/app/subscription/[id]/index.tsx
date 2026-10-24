@@ -18,6 +18,7 @@ import {
 import { cycleSuffix, daysUntil, monthlyEquivalent } from '@/domain/billing';
 import { dateOfDateTime, formatDaysLeft, formatFullDate } from '@/domain/dates';
 import { formatMinor, formatMoney, fromMinor } from '@/domain/money';
+import { effectiveNotification } from '@/domain/notifications';
 import { formatPaymentMethod } from '@/domain/paymentMethod';
 import type {
   BillingCycle,
@@ -26,6 +27,7 @@ import type {
   SubscriptionInput,
 } from '@/domain/types';
 import { useCategories } from '@/features/categories/store';
+import { ensureNotificationPermission } from '@/features/notifications/permission';
 import { usePaymentMethodStore } from '@/features/paymentMethods/store';
 import { usePremium } from '@/features/premium/usePremium';
 import { useSettingsStore } from '@/features/settings/store';
@@ -96,8 +98,13 @@ function Detail({ sub }: { sub: Subscription }) {
     warning: colors.warning,
     neutral: colors.textSecondary,
   }[tone];
-  // 無料版は全体設定に従う（サブスクごとの通知設定はプレミアム）
-  const notification: NotificationSetting = isPremium ? sub.notification : notificationDefaults;
+  // 無料版は全体設定に従う（サブスクごとの通知設定はプレミアム）。全体設定のオフはすべてに優先する
+  const notification: NotificationSetting = effectiveNotification(
+    sub,
+    notificationDefaults,
+    isPremium,
+  );
+  const globalOff = !notificationDefaults.enabled;
 
   const save = async (patch: Partial<SubscriptionInput>) => {
     try {
@@ -110,6 +117,16 @@ function Detail({ sub }: { sub: Subscription }) {
       );
     }
   };
+
+  const explainGlobalOff = () =>
+    Alert.alert(
+      '通知の全体設定がオフです',
+      '設定 → 通知設定 で「更新前に通知する」をオンにすると、サブスクごとの通知が届きます。',
+      [
+        { text: '閉じる', style: 'cancel' },
+        { text: '通知設定を開く', onPress: () => router.push('/settings/notifications') },
+      ],
+    );
 
   const requirePremium = () =>
     Alert.alert(
@@ -239,7 +256,13 @@ function Detail({ sub }: { sub: Subscription }) {
               iconColor={accent.secondary}
               title="更新前に通知する"
               showChevron={false}
-              onPress={isPremium ? () => setSheet('notification') : requirePremium}
+              onPress={
+                globalOff
+                  ? explainGlobalOff
+                  : isPremium
+                    ? () => setSheet('notification')
+                    : requirePremium
+              }
               accessibilityLabel={`更新前に通知する、${notification.enabled ? `${notifyDaysLabel(notification.daysBefore)} ${notification.time}` : 'オフ'}`}
               trailing={
                 <View style={[styles.inline, { gap: spacing.xs }]}>
@@ -258,11 +281,12 @@ function Detail({ sub }: { sub: Subscription }) {
                   )}
                   <Toggle
                     value={notification.enabled}
-                    disabled={!isPremium || cancelled}
+                    disabled={!isPremium || cancelled || globalOff}
                     accessibilityLabel="更新前に通知する"
-                    onValueChange={(enabled) =>
-                      save({ notification: { ...sub.notification, enabled } })
-                    }
+                    onValueChange={async (enabled) => {
+                      await save({ notification: { ...sub.notification, enabled } });
+                      if (enabled) await ensureNotificationPermission({ explicit: true });
+                    }}
                   />
                 </View>
               }

@@ -2,6 +2,8 @@ import { randomUUID } from 'expo-crypto';
 
 import { getDb } from './client';
 import { CategoryRepository } from './repositories/CategoryRepository';
+import { DataTransferRepository } from './repositories/DataTransferRepository';
+import { NotificationRepository } from './repositories/NotificationRepository';
 import { PaymentMethodRepository } from './repositories/PaymentMethodRepository';
 import { PaymentRepository } from './repositories/PaymentRepository';
 import { SettingsRepository } from './repositories/SettingsRepository';
@@ -13,6 +15,8 @@ export type Repositories = {
   paymentMethods: PaymentMethodRepository;
   payments: PaymentRepository;
   settings: SettingsRepository;
+  notifications: NotificationRepository;
+  dataTransfer: DataTransferRepository;
 };
 
 let repositories: Repositories | null = null;
@@ -28,6 +32,8 @@ export async function initRepositories(): Promise<Repositories> {
     paymentMethods: new PaymentMethodRepository(db, generateId),
     payments: new PaymentRepository(db, generateId),
     settings: new SettingsRepository(db),
+    notifications: new NotificationRepository(db),
+    dataTransfer: new DataTransferRepository(db),
   };
   return repositories;
 }

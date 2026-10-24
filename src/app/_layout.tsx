@@ -8,13 +8,17 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ErrorState } from '@/components/ui';
 import { useAppInit } from '@/features/app/useAppInit';
+import { useNotificationTap } from '@/features/notifications/useNotificationTap';
+import { configureNotificationHandler } from '@/services/notifications';
 import { ThemeProvider, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+configureNotificationHandler();
 
 function RootStack() {
   const { colors, scheme } = useTheme();
   const { status, retry } = useAppInit();
+  useNotificationTap(status === 'ready');
 
   useEffect(() => {
     if (status !== 'loading') SplashScreen.hideAsync().catch(() => {});
@@ -40,6 +44,7 @@ function RootStack() {
           contentStyle: { backgroundColor: colors.background },
         }}>
         <Stack.Screen name="add" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
       </Stack>
     </>
   );

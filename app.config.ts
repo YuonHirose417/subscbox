@@ -33,6 +33,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-router',
+    // ローカル通知のみ使う（プッシュ通知は使わないので APNs の entitlement を付けない）
+    ['expo-notifications', { enableRemoteNotifications: false }],
     [
       'expo-splash-screen',
       {
