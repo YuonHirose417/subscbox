@@ -47,3 +47,6 @@ coverage/
 
 # ローカルの環境変数（値は .env.example を参照）
 .env
+
+# 公式ロゴの元ファイル（取得元は design/logo-src/SOURCES.md。再配布しないためコミットしない）
+design/logo-src/
