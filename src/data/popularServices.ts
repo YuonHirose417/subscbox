@@ -29,7 +29,7 @@ const jpy = (amountMinor: number, cycle: BillingCycle = monthly) =>
   ({ amountMinor, currency: 'JPY', cycle }) as const;
 
 /**
- * 人気サービスのプリセット。先頭8件が「人気のサービス」グリッド（カンプの並び順）。
+ * 人気サービスのプリセット。「人気のサービス」グリッドの8件は下の featuredServices で決める。
  * 価格は参考値（目安）で、改定される可能性がある。
  */
 export const popularServices: readonly ServicePreset[] = [
@@ -268,9 +268,25 @@ export const popularServices: readonly ServicePreset[] = [
   },
 ];
 
-/** 「人気のサービス」グリッドに出す8件（カンプの並び） */
-export const featuredServices = popularServices.slice(0, 8);
-
 export const popularServicesByKey: Readonly<Record<string, ServicePreset>> = Object.fromEntries(
   popularServices.map((s) => [s.key, s]),
+);
+
+/**
+ * 「人気のサービス」グリッドに出す8件。公式ロゴのあるサービスを先頭にしている
+ * （カンプとの差分。design/MOCKUP_DIFF.md を参照）
+ */
+const FEATURED_KEYS = [
+  'youtube',
+  'spotify',
+  'chatgpt',
+  'x_premium',
+  'netflix',
+  'amazon_prime',
+  'google_one',
+  'icloud',
+] as const;
+
+export const featuredServices: readonly ServicePreset[] = FEATURED_KEYS.map(
+  (key) => popularServicesByKey[key],
 );
