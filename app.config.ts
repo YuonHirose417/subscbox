@@ -12,7 +12,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'subscbox',
   userInterfaceStyle: 'automatic',
   ios: {
-    icon: './assets/expo.icon',
+    // アプリアイコン（assets/images/icon-source.png から 1024×1024・透過なしで作ったもの）
+    icon: './assets/images/icon.png',
     bundleIdentifier: 'com.yuonhirose.subscbox',
     supportsTablet: false,
     config: {
@@ -22,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     package: 'com.yuonhirose.subscbox',
     adaptiveIcon: {
-      backgroundColor: '#E6F4FE',
+      backgroundColor: '#000000',
       foregroundImage: './assets/images/android-icon-foreground.png',
       backgroundImage: './assets/images/android-icon-background.png',
       monochromeImage: './assets/images/android-icon-monochrome.png',
@@ -66,7 +67,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       {
         backgroundColor: '#F5F6FA',
         image: './assets/images/splash-icon.png',
-        imageWidth: 76,
+        // 角丸のアプリアイコンを中央に出す
+        imageWidth: 120,
         dark: { backgroundColor: '#0B0D14' },
       },
     ],
