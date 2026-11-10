@@ -1,6 +1,7 @@
 import { popularServicesByKey } from '@/data/popularServices';
 import { makeSub } from './fixtures';
 import {
+  startsWithCustomPlan,
   suggestNextRenewal,
   toSubmission,
   valuesForCustom,
@@ -104,5 +105,26 @@ describe('form values', () => {
       value: null,
       color: '#000000',
     });
+  });
+});
+
+describe('startsWithCustomPlan', () => {
+  const names = ['広告つきスタンダード', 'スタンダードプラン', 'プレミアム'];
+
+  it('selects a preset chip when the saved name matches', () => {
+    expect(startsWithCustomPlan('スタンダードプラン', names)).toBe(false);
+  });
+
+  it('selects "その他（入力）" for a plan name that is not in the presets', () => {
+    expect(startsWithCustomPlan('新プラン', names)).toBe(true);
+  });
+
+  it('selects nothing when the plan name is empty', () => {
+    expect(startsWithCustomPlan('', names)).toBe(false);
+    expect(startsWithCustomPlan('  ', names)).toBe(false);
+  });
+
+  it('always uses free input when the service has no preset plans (ChatGPT)', () => {
+    expect(startsWithCustomPlan('', [])).toBe(true);
   });
 });

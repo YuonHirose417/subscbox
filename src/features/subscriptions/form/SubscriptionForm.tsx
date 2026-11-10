@@ -44,6 +44,7 @@ import { pickIconImage } from '../iconImages';
 import { CategoryPickerSheet } from './CategoryPickerSheet';
 import { ColorChoices } from './ColorChoices';
 import {
+  startsWithCustomPlan,
   suggestNextRenewal,
   toSubmission,
   type FormField,
@@ -83,6 +84,13 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
   const isCustom = !preset;
   // 名前のあるプランだけ候補に出す（ChatGPT のように参考価格だけでプラン名を決めないサービスがある）
   const presetPlans = preset?.plans.filter((plan) => plan.name !== '') ?? [];
+  // 「その他（入力）」を選んでいるか（サービス側の新しいプランなど、候補にないプラン名を自由に入れる）
+  const [customPlan, setCustomPlan] = useState(() =>
+    startsWithCustomPlan(
+      initialValues.planName,
+      presetPlans.map((plan) => plan.name),
+    ),
+  );
   const category = categories.find((c) => c.id === values.categoryId);
   const paymentMethod = paymentMethods.find((m) => m.id === values.paymentMethodId);
   const { input, errors } = useMemo(
@@ -105,6 +113,7 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
 
   const applyPlan = (plan: ServicePlanPreset) => {
     Haptics.selectionAsync().catch(() => {});
+    setCustomPlan(false);
     update({
       planName: plan.name,
       amountText: String(fromMinor(plan.amountMinor, plan.currency)),
@@ -112,6 +121,14 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
       cycle: plan.cycle,
       usesReferencePrice: true,
     });
+  };
+
+  /** 「その他（入力）」：金額・周期はそのまま。候補のプラン名が入っていたら消して、入力してもらう */
+  const chooseCustomPlan = () => {
+    if (customPlan) return;
+    Haptics.selectionAsync().catch(() => {});
+    setCustomPlan(true);
+    if (presetPlans.some((plan) => plan.name === values.planName)) update({ planName: '' });
   };
 
   const submit = async () => {
@@ -231,11 +248,8 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
             />
           </FormRow>
         ) : null}
-        <FormRow
-          label="プラン名"
-          stacked={presetPlans.length > 0}
-          error={errorOf('planName')}>
-          {presetPlans.length > 0 ? (
+        <FormRow label="プラン名" stacked={!!preset} error={errorOf('planName')}>
+          {preset ? (
             <View style={{ gap: spacing.xs }}>
               <ScrollView
                 horizontal
@@ -245,20 +259,23 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
                   <Chip
                     key={plan.name}
                     label={plan.name}
-                    selected={values.planName === plan.name}
+                    selected={!customPlan && values.planName === plan.name}
                     onPress={() => applyPlan(plan)}
                   />
                 ))}
+                <Chip label="その他（入力）" selected={customPlan} onPress={chooseCustomPlan} />
               </ScrollView>
-              <TextField
-                align="left"
-                value={values.planName}
-                onChangeText={(planName) => update({ planName })}
-                onBlur={() => touch('planName')}
-                placeholder="プラン名を入力（任意）"
-                maxLength={LIMITS.planNameMax}
-                accessibilityLabel="プラン名"
-              />
+              {customPlan ? (
+                <TextField
+                  align="left"
+                  value={values.planName}
+                  onChangeText={(planName) => update({ planName })}
+                  onBlur={() => touch('planName')}
+                  placeholder="プラン名を入力（任意）"
+                  maxLength={LIMITS.planNameMax}
+                  accessibilityLabel="プラン名"
+                />
+              ) : null}
             </View>
           ) : (
             <TextField

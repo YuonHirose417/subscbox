@@ -53,6 +53,16 @@ export function suggestNextRenewal(startDate: string, cycle: BillingCycle, today
   );
 }
 
+/**
+ * 「その他（入力）」のチップを選んだ状態で始めるか。
+ * 候補のプランが無いサービス、または保存済みのプラン名がどの候補にも当てはまらないとき
+ */
+export function startsWithCustomPlan(planName: string, planNames: readonly string[]): boolean {
+  if (planNames.length === 0) return true;
+  const name = planName.trim();
+  return name !== '' && !planNames.includes(name);
+}
+
 export function valuesFromPreset(
   preset: ServicePreset,
   plan: ServicePlanPreset | undefined,
