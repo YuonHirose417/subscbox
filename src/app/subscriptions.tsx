@@ -144,9 +144,7 @@ export default function SubscriptionsScreen() {
           showsVerticalScrollIndicator={false}
           ListFooterComponent={
             items.length > 0 ? (
-              <View style={{ paddingHorizontal: spacing.screen, paddingTop: spacing.md }}>
-                <InlineBanner />
-              </View>
+              <InlineBanner style={{ marginHorizontal: spacing.screen, marginTop: spacing.md }} />
             ) : undefined
           }
           ListEmptyComponent={

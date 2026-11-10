@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { AppText } from '@/components/ui';
 import { usePremium } from '@/features/premium/usePremium';
@@ -9,8 +9,9 @@ import { useTheme } from '@/theme';
 /**
  * 無料版だけに出すインラインの広告バナー（一覧・分析の末尾）。
  * プレミアム・広告が使えない環境・読み込み失敗（在庫なし等）のときは何も表示しない（空の枠を残さない）。
+ * style（周りの余白など）は広告を読み込めたときだけ付ける。読み込み中・失敗時に余白だけが残らないようにするため
  */
-export function InlineBanner() {
+export function InlineBanner({ style }: { style?: StyleProp<ViewStyle> }) {
   const { spacing, colors, radius } = useTheme();
   const { isPremium } = usePremium();
   const canRequestAds = useAdsStore((s) => s.canRequestAds);
@@ -30,6 +31,7 @@ export function InlineBanner() {
           paddingVertical: loaded ? spacing.xs : 0,
           gap: spacing.xxs,
         },
+        loaded ? style : null,
       ]}>
       {loaded ? (
         <AppText variant="caption" tone="tertiary" style={{ paddingHorizontal: spacing.sm }}>
