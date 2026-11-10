@@ -16,6 +16,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     icon: './assets/images/icon.png',
     bundleIdentifier: 'com.yuonhirose.subscbox',
     supportsTablet: false,
+    infoPlist: {
+      // ホーム画面に表示する名前だけ英字にする（App Store のアプリ名は App Store Connect の「サブスクBox」のまま）
+      CFBundleDisplayName: 'SubscBox',
+    },
     config: {
       usesNonExemptEncryption: false,
     },
