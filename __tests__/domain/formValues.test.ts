@@ -55,6 +55,10 @@ describe('form values', () => {
       '2025-10-17',
     );
     expect(v.amountText).toBe('20');
+    // ChatGPT はプラン名を決めず、参考価格だけを初期値にする
+    expect(v.name).toBe('ChatGPT');
+    expect(v.planName).toBe('');
+    expect(v.usesReferencePrice).toBe(true);
     expect(toSubmission({ ...v, amountText: '19.99' }, null).input.amountMinor).toBe(1999);
   });
 
@@ -80,12 +84,10 @@ describe('form values', () => {
     expect(v.renewalEdited).toBe(true);
     const { input, errors } = toSubmission(v, null);
     expect(errors).toEqual({});
-    expect(input).toMatchObject({
-      name: 'Hulu',
-      amountMinor: 1026,
-      memo: 'メモ',
-      url: 'https://hulu.jp',
-    });
+    expect(input).toMatchObject({ name: 'Hulu', amountMinor: 1026 });
+    // URL・メモはフォームから保存しない（編集では元の値が残る）
+    expect(input).not.toHaveProperty('url');
+    expect(input).not.toHaveProperty('memo');
   });
 
   it('keeps a custom icon image and drops it when removed', () => {

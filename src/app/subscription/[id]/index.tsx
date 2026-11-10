@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Linking, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
@@ -249,7 +249,7 @@ function Detail({ sub }: { sub: Subscription }) {
                 {paymentMethod ? formatPaymentMethod(paymentMethod) : '未設定'}
               </AppText>
             </FormRow>
-            <FormRow label="カテゴリ" separator onPress={() => setSheet('category')}>
+            <FormRow label="カテゴリ" onPress={() => setSheet('category')}>
               <View style={[styles.inline, { gap: spacing.xs }]}>
                 {category ? (
                   <View
@@ -266,11 +266,6 @@ function Detail({ sub }: { sub: Subscription }) {
                   {category?.name ?? '未分類'}
                 </AppText>
               </View>
-            </FormRow>
-            <FormRow label="メモ">
-              <AppText variant="body" tone={sub.memo ? 'primary' : 'tertiary'} style={styles.right}>
-                {sub.memo || '-'}
-              </AppText>
             </FormRow>
           </Card>
 
@@ -321,29 +316,6 @@ function Detail({ sub }: { sub: Subscription }) {
 
           {/* アクションカード */}
           <Card padding={0} style={{ paddingHorizontal: spacing.md }}>
-            {sub.url ? (
-              <ListRow
-                icon="safari"
-                iconBackground={withAlpha(accent.primary, 0.12)}
-                iconColor={accent.primary}
-                title="サービスを開く"
-                showChevron={false}
-                trailing={
-                  <Icon
-                    name="arrow.up.right.square"
-                    fallback="open-outline"
-                    size={17}
-                    color={colors.textSecondary}
-                  />
-                }
-                separator
-                onPress={() =>
-                  Linking.openURL(sub.url!).catch(() =>
-                    Alert.alert('URLを開けませんでした', sub.url!),
-                  )
-                }
-              />
-            ) : null}
             <ListRow
               icon="square.and.pencil"
               iconBackground={withAlpha(colors.info, 0.12)}

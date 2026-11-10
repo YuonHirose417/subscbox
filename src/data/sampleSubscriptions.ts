@@ -21,7 +21,6 @@ type SampleSpec = {
   lastUsedDaysAgo?: number;
   cancelledMonthsAgo?: number;
   name?: string;
-  memo?: string;
 };
 
 const monthly = { unit: 'month', interval: 1 } as const;
@@ -137,8 +136,8 @@ export function buildSampleData(now: Date = new Date()): {
         color: preset?.brandColor ?? null,
       },
       paymentMethodId: null,
-      url: preset?.url ?? null,
-      memo: spec.memo ?? null,
+      url: null,
+      memo: null,
       notification: { enabled: true, daysBefore: 3, time: '09:00' },
       status: cancelledAt ? 'cancelled' : 'active',
       cancelledAt,

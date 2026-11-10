@@ -90,7 +90,6 @@ describe('createBackup / parseBackup', () => {
       (d) => (d.subscriptions[0].amountMinor = -1),
       (d) => (d.subscriptions[0].startDate = '2025-02-30'),
       (d) => ((d.subscriptions[0] as { currency: string }).currency = 'XXX'),
-      (d) => (d.subscriptions[0].url = 'javascript:alert(1)'),
       (d) => (d.subscriptions[0].icon = { type: 'image', value: '../../etc/passwd', color: null }),
       (d) => (d.paymentMethods[0].last4 = '12345678'),
       (d) => ((d.payments[0] as { status: string }).status = 'unknown'),
@@ -103,6 +102,13 @@ describe('createBackup / parseBackup', () => {
       mutate(data);
       expect(parseBackup(serialize(data)).ok).toBe(false);
     }
+  });
+
+  it('restores old backups that still contain a URL or memo', () => {
+    const data = sample();
+    data.subscriptions[0].url = 'ftp://example.com';
+    data.subscriptions[0].memo = 'x'.repeat(501);
+    expect(parseBackup(serialize(data)).ok).toBe(true);
   });
 
   it('rejects broken references and duplicates', () => {
@@ -157,7 +163,9 @@ describe('csv', () => {
       amountMinor: 2000,
       currency: 'USD',
       cycle: { unit: 'year', interval: 1 },
-      memo: 'メモ, カンマ',
+      planName: 'Plus, Team',
+      url: 'https://chatgpt.com/',
+      memo: 'メモ',
     });
     const csv = subscriptionsCsv(
       [...data.subscriptions, usd],
@@ -167,10 +175,11 @@ describe('csv', () => {
     );
     const lines = csv.slice(1).trim().split('\r\n');
     expect(lines[0].split(',')[0]).toBe('サービス名');
+    expect(lines[0]).not.toMatch(/URL|メモ/);
     expect(lines[1]).toContain('Netflix,,1590,JPY,毎月,1590');
     expect(lines[1]).toContain('クレジットカード（****1234）');
-    expect(lines[2]).toContain('ChatGPT,,20,USD,毎年,,');
-    expect(lines[2]).toContain('"メモ, カンマ"');
+    expect(lines[2]).toContain('ChatGPT,"Plus, Team",20,USD,毎年,,');
+    expect(lines[2]).not.toMatch(/chatgpt.com|メモ/);
 
     const pay = paymentsCsv(data.payments, data.subscriptions).slice(1).trim().split('\r\n');
     expect(pay).toEqual([

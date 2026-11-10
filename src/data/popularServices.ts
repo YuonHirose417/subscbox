@@ -1,6 +1,7 @@
 import type { BillingCycle, CurrencyCode, DefaultCategoryId } from '@/domain/types';
 
 export type ServicePlanPreset = {
+  /** 空文字のときはプラン名を決めない（候補に出さず、ユーザーが自由に入力する） */
   name: string;
   /** 参考価格（目安）。フォームの初期値にするだけで、実際の金額はユーザーが確認・修正する */
   amountMinor: number;
@@ -19,7 +20,6 @@ export type ServicePreset = {
   monogram: string;
   /** 検索用の別名（カタカナ表記など） */
   aliases?: string[];
-  url?: string;
   plans: ServicePlanPreset[];
 };
 
@@ -40,7 +40,6 @@ export const popularServices: readonly ServicePreset[] = [
     brandColor: '#E50914',
     monogram: 'N',
     aliases: ['ネットフリックス'],
-    url: 'https://www.netflix.com/',
     plans: [
       { name: '広告つきスタンダード', ...jpy(890) },
       { name: 'スタンダードプラン', ...jpy(1590) },
@@ -55,7 +54,6 @@ export const popularServices: readonly ServicePreset[] = [
     brandColor: '#FF0033',
     monogram: 'Y',
     aliases: ['ユーチューブ', 'YouTube'],
-    url: 'https://www.youtube.com/premium',
     plans: [
       { name: '個人プラン', ...jpy(1280) },
       { name: 'ファミリープラン', ...jpy(2280) },
@@ -68,7 +66,6 @@ export const popularServices: readonly ServicePreset[] = [
     brandColor: '#1DB954',
     monogram: 'S',
     aliases: ['スポティファイ'],
-    url: 'https://open.spotify.com/',
     plans: [
       { name: 'Premiumプラン', ...jpy(980) },
       { name: 'Premium Duo', ...jpy(1280) },
@@ -82,7 +79,6 @@ export const popularServices: readonly ServicePreset[] = [
     brandColor: '#00A8E1',
     monogram: 'a',
     aliases: ['アマゾンプライム', 'プライムビデオ'],
-    url: 'https://www.amazon.co.jp/prime',
     plans: [
       { name: '月間プラン', ...jpy(600) },
       { name: '年間プラン', ...jpy(5900, yearly) },
@@ -95,7 +91,6 @@ export const popularServices: readonly ServicePreset[] = [
     brandColor: '#4285F4',
     monogram: 'G',
     aliases: ['グーグルワン'],
-    url: 'https://one.google.com/',
     plans: [
       { name: 'ベーシック（100GB）', ...jpy(250) },
       { name: 'プレミアム（2TB）', ...jpy(1300) },
@@ -121,7 +116,6 @@ export const popularServices: readonly ServicePreset[] = [
     brandColor: '#EA3E23',
     monogram: 'M',
     aliases: ['マイクロソフト', 'オフィス', 'Office'],
-    url: 'https://www.microsoft365.com/',
     plans: [
       { name: 'Personal', ...jpy(2130) },
       { name: 'Personal（年額）', ...jpy(21300, yearly) },
@@ -135,7 +129,6 @@ export const popularServices: readonly ServicePreset[] = [
     brandColor: '#FA0F00',
     monogram: 'A',
     aliases: ['アドビ', 'Adobe'],
-    url: 'https://www.adobe.com/jp/creativecloud.html',
     plans: [
       { name: 'フォトプラン', ...jpy(1180) },
       { name: 'コンプリートプラン', ...jpy(7780) },
@@ -166,7 +159,6 @@ export const popularServices: readonly ServicePreset[] = [
     brandColor: '#113CCF',
     monogram: 'D',
     aliases: ['ディズニープラス'],
-    url: 'https://www.disneyplus.com/',
     plans: [
       { name: 'スタンダード', ...jpy(1140) },
       { name: 'プレミアム', ...jpy(1520) },
@@ -179,7 +171,6 @@ export const popularServices: readonly ServicePreset[] = [
     brandColor: '#111111',
     monogram: 'U',
     aliases: ['ユーネクスト'],
-    url: 'https://video.unext.jp/',
     plans: [{ name: '月額プラン', ...jpy(2189) }],
   },
   {
@@ -202,12 +193,13 @@ export const popularServices: readonly ServicePreset[] = [
   },
   {
     key: 'chatgpt',
-    name: 'ChatGPT Plus',
+    name: 'ChatGPT',
     categoryId: 'productivity',
     brandColor: '#10A37F',
     monogram: 'C',
     aliases: ['チャットGPT', 'OpenAI'],
-    plans: [{ name: 'Plus', amountMinor: 2000, currency: 'USD', cycle: monthly }],
+    // プランが多いのでプラン名は決めない（空）。金額は Plus の参考価格を初期値にする
+    plans: [{ name: '', amountMinor: 2000, currency: 'USD', cycle: monthly }],
   },
   {
     key: 'notion',

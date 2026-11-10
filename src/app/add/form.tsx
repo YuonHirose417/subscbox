@@ -64,7 +64,8 @@ export default function AddFormScreen() {
             if (reachedSubscriptionLimit(useSubscriptionStore.getState().items, isPremium)) {
               throw new LimitReachedError(SUBSCRIPTION_LIMIT_REASON);
             }
-            await createSubscription(input);
+            // URL・メモは入力欄をなくしたので空で作る（DB の列は残してある）
+            await createSubscription({ ...input, url: null, memo: null });
             // 追加モーダル全体を閉じる（親のルートスタックで戻る）
             navigation.getParent()?.goBack();
           }}

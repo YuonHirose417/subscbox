@@ -28,8 +28,6 @@ export type FormValues = {
   /** カスタムアイコン画像（プレミアム）の相対パス */
   iconImage: string | null;
   paymentMethodId: string | null;
-  url: string;
-  memo: string;
   notification: NotificationSetting;
   lastUsedDate: string | null;
   /** プリセットの参考価格を初期値にしたか（「目安」の注記を出す） */
@@ -37,6 +35,12 @@ export type FormValues = {
 };
 
 export type FormField = keyof ValidationErrors;
+
+/**
+ * フォームから保存する値。URL・メモは入力欄をなくしたので含めない
+ * （DB の列とバックアップの項目は残してある。編集では元の値をそのまま残す）
+ */
+export type FormSubmission = Omit<SubscriptionInput, 'url' | 'memo'>;
 
 const amountToText = (amountMinor: number, currency: CurrencyCode) =>
   String(fromMinor(amountMinor, currency));
@@ -70,8 +74,6 @@ export function valuesFromPreset(
     iconColor: null,
     iconImage: null,
     paymentMethodId: null,
-    url: preset.url ?? '',
-    memo: '',
     notification,
     lastUsedDate: null,
     usesReferencePrice: !!plan,
@@ -99,8 +101,6 @@ export function valuesForCustom(
     iconColor: null,
     iconImage: null,
     paymentMethodId: null,
-    url: '',
-    memo: '',
     notification,
     lastUsedDate: null,
     usesReferencePrice: false,
@@ -122,8 +122,6 @@ export function valuesFromSubscription(sub: Subscription): FormValues {
     iconColor: sub.serviceKey ? null : sub.icon.color,
     iconImage: sub.icon.type === 'image' ? sub.icon.value : null,
     paymentMethodId: sub.paymentMethodId,
-    url: sub.url ?? '',
-    memo: sub.memo ?? '',
     notification: sub.notification,
     lastUsedDate: sub.lastUsedDate,
     usesReferencePrice: false,
@@ -134,9 +132,9 @@ export function valuesFromSubscription(sub: Subscription): FormValues {
 export function toSubmission(
   values: FormValues,
   brandColor: string | null,
-): { input: SubscriptionInput; errors: ValidationErrors } {
+): { input: FormSubmission; errors: ValidationErrors } {
   const amountMinor = parseAmountInput(values.amountText, values.currency);
-  const input: SubscriptionInput = {
+  const input: FormSubmission = {
     serviceKey: values.serviceKey,
     name: values.name.trim(),
     planName: values.planName.trim() || null,
@@ -150,8 +148,6 @@ export function toSubmission(
       ? { type: 'image', value: values.iconImage, color: values.iconColor ?? brandColor }
       : { type: 'monogram', value: null, color: values.iconColor ?? brandColor },
     paymentMethodId: values.paymentMethodId,
-    url: values.url.trim() || null,
-    memo: values.memo.trim() || null,
     notification: values.notification,
     lastUsedDate: values.lastUsedDate,
   };

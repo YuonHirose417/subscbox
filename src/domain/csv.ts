@@ -27,7 +27,7 @@ function cycleLabel(sub: Subscription): string {
   return `${interval}${CYCLE_LABEL[unit]}ごと`;
 }
 
-/** サブスク一覧の CSV（プレミアム）。金額は通常の単位、月額換算は円 */
+/** サブスク一覧の CSV（プレミアム）。金額は通常の単位、月額換算は円。URL・メモは機能をなくしたので出さない */
 export function subscriptionsCsv(
   subs: readonly Subscription[],
   categories: readonly Category[],
@@ -46,8 +46,6 @@ export function subscriptionsCsv(
     'カテゴリ',
     '支払い方法',
     '状態',
-    'URL',
-    'メモ',
   ];
   const rows = subs.map((sub) => {
     const monthly = monthlyJpy(sub, rates);
@@ -64,8 +62,6 @@ export function subscriptionsCsv(
       categories.find((c) => c.id === sub.categoryId)?.name ?? null,
       method ? formatPaymentMethod(method) : null,
       sub.status === 'active' ? '契約中' : '解約済み',
-      sub.url,
-      sub.memo,
     ];
   });
   return toCsv([header, ...rows]);

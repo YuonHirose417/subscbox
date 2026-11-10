@@ -1,5 +1,5 @@
 import { toInput } from '@/domain/subscription';
-import { isAllowedUrl, validateSubscriptionInput } from '@/domain/validation';
+import { validateSubscriptionInput } from '@/domain/validation';
 
 import { makeSub } from './fixtures';
 
@@ -18,20 +18,16 @@ describe('validateSubscriptionInput', () => {
       amountMinor: 0,
       cycle: { unit: 'month', interval: 0 },
       startDate: '2025-02-30',
-      url: 'ftp://example.com',
-      memo: 'x'.repeat(501),
       notification: { enabled: true, daysBefore: 3, time: '25:00' },
     });
     expect(Object.keys(errors).sort()).toEqual(
       [
         'amountMinor',
         'cycle',
-        'memo',
         'name',
         'notification',
         'planName',
         'startDate',
-        'url',
       ].sort(),
     );
   });
@@ -47,10 +43,8 @@ describe('validateSubscriptionInput', () => {
     ).toEqual({});
   });
 
-  it('allows only http/https URLs', () => {
-    expect(isAllowedUrl('https://www.netflix.com/')).toBe(true);
-    expect(isAllowedUrl('http://example.com')).toBe(true);
-    expect(isAllowedUrl('javascript:alert(1)')).toBe(false);
-    expect(isAllowedUrl('https://')).toBe(false);
+  it('ignores URL and memo (the fields are no longer used)', () => {
+    const legacy = { ...valid(), url: 'javascript:alert(1)', memo: 'x'.repeat(501) };
+    expect(validateSubscriptionInput(legacy)).toEqual({});
   });
 });

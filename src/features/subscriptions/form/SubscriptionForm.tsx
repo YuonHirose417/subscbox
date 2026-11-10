@@ -21,7 +21,7 @@ import { parseDate, toDateString } from '@/domain/dates';
 import { currencies, currencyCodes, fromMinor } from '@/domain/money';
 import { effectiveNotification } from '@/domain/notifications';
 import { formatPaymentMethod } from '@/domain/paymentMethod';
-import type { CycleUnit, SubscriptionInput } from '@/domain/types';
+import type { CycleUnit } from '@/domain/types';
 import { LIMITS } from '@/domain/validation';
 import { useCategories } from '@/features/categories/store';
 import { ensureNotificationPermission } from '@/features/notifications/permission';
@@ -43,14 +43,21 @@ import { ServiceIcon } from '../components/ServiceIcon';
 import { pickIconImage } from '../iconImages';
 import { CategoryPickerSheet } from './CategoryPickerSheet';
 import { ColorChoices } from './ColorChoices';
-import { suggestNextRenewal, toSubmission, type FormField, type FormValues } from './formValues';
+import {
+  suggestNextRenewal,
+  toSubmission,
+  type FormField,
+  type FormSubmission,
+  type FormValues,
+} from './formValues';
 import { PaymentMethodPickerSheet } from './PaymentMethodPickerSheet';
 
 type Props = {
   initialValues: FormValues;
   submitLabel: string;
   today: string;
-  onSubmit: (input: SubscriptionInput) => Promise<void>;
+  /** URL・メモは含まない（新規は null で作成し、編集では元の値を残す） */
+  onSubmit: (input: FormSubmission) => Promise<void>;
 };
 
 const CYCLE_OPTIONS = [
@@ -74,6 +81,8 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
 
   const preset = values.serviceKey ? popularServicesByKey[values.serviceKey] : undefined;
   const isCustom = !preset;
+  // 名前のあるプランだけ候補に出す（ChatGPT のように参考価格だけでプラン名を決めないサービスがある）
+  const presetPlans = preset?.plans.filter((plan) => plan.name !== '') ?? [];
   const category = categories.find((c) => c.id === values.categoryId);
   const paymentMethod = paymentMethods.find((m) => m.id === values.paymentMethodId);
   const { input, errors } = useMemo(
@@ -224,15 +233,15 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
         ) : null}
         <FormRow
           label="プラン名"
-          stacked={!!preset && preset.plans.length > 0}
+          stacked={presetPlans.length > 0}
           error={errorOf('planName')}>
-          {preset && preset.plans.length > 0 ? (
+          {presetPlans.length > 0 ? (
             <View style={{ gap: spacing.xs }}>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ gap: spacing.xs }}>
-                {preset.plans.map((plan) => (
+                {presetPlans.map((plan) => (
                   <Chip
                     key={plan.name}
                     label={plan.name}
@@ -477,34 +486,6 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
         )}
       </Card>
 
-      {/* その他 */}
-      <Card padding={0} style={cardStyle}>
-        <FormRow label="URL" separator error={errorOf('url')}>
-          <TextField
-            value={values.url}
-            onChangeText={(url) => update({ url })}
-            onBlur={() => touch('url')}
-            placeholder="https://（任意）"
-            keyboardType="url"
-            autoCapitalize="none"
-            autoCorrect={false}
-            accessibilityLabel="URL"
-          />
-        </FormRow>
-        <FormRow label="メモ" stacked error={errorOf('memo')}>
-          <TextField
-            align="left"
-            multiline
-            value={values.memo}
-            onChangeText={(memo) => update({ memo })}
-            onBlur={() => touch('memo')}
-            placeholder="任意（500文字まで）"
-            maxLength={LIMITS.memoMax}
-            accessibilityLabel="メモ"
-          />
-        </FormRow>
-      </Card>
-
       <View style={{ gap: spacing.xs }}>
         <Button title={submitLabel} onPress={submit} disabled={!isValid} loading={saving} />
         {!isValid ? (
@@ -517,8 +498,6 @@ export function SubscriptionForm({ initialValues, submitLabel, today, onSubmit }
                 cycle: true,
                 startDate: true,
                 nextRenewalDate: true,
-                url: true,
-                memo: true,
                 planName: true,
                 notification: true,
               })

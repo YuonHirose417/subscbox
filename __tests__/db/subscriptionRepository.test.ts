@@ -49,14 +49,11 @@ function repositorySuite(
       await expect(repo.create(input({ name: '  ' }))).rejects.toMatchObject({
         code: 'VALIDATION',
       });
-      await expect(repo.create(input({ url: 'javascript:alert(1)' }))).rejects.toMatchObject({
-        code: 'VALIDATION',
-      });
     });
 
     it('adds price history only when price or cycle changes', async () => {
       const sub = await repo.create(input());
-      await repo.update(sub.id, { memo: 'メモ' });
+      await repo.update(sub.id, { planName: 'プラン' });
       expect((await repo.getPriceHistory()).length).toBe(1);
       const updated = await repo.update(sub.id, { amountMinor: 1500 });
       expect(updated.amountMinor).toBe(1500);

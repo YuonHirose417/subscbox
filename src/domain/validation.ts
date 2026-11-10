@@ -5,20 +5,19 @@ import type { SubscriptionInput } from './types';
 export const LIMITS = {
   nameMax: 50,
   planNameMax: 50,
-  memoMax: 500,
   /** 金額の上限（通常の単位） */
   amountMax: 9_999_999,
 } as const;
 
 export type ValidationErrors = Partial<Record<keyof SubscriptionInput, string>>;
 
-/** http / https のみ許可 */
-export function isAllowedUrl(value: string): boolean {
-  return /^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(value);
-}
-
-/** 保存前の検証。エラーがなければ空オブジェクト */
-export function validateSubscriptionInput(input: SubscriptionInput): ValidationErrors {
+/**
+ * 保存前の検証。エラーがなければ空オブジェクト。
+ * URL・メモは入力欄をなくした（DB の列は残して使わない）ので検証しない。古いバックアップに入っていても復元できる
+ */
+export function validateSubscriptionInput(
+  input: Omit<SubscriptionInput, 'url' | 'memo'>,
+): ValidationErrors {
   const errors: ValidationErrors = {};
   const name = input.name.trim();
   if (name.length === 0) errors.name = 'サービス名を入力してください';
@@ -47,12 +46,6 @@ export function validateSubscriptionInput(input: SubscriptionInput): ValidationE
     !/^([01]\d|2[0-3]):[0-5]\d$/.test(input.notification.time)
   ) {
     errors.notification = '通知のタイミングを正しく設定してください';
-  }
-  if (input.url && !isAllowedUrl(input.url)) {
-    errors.url = 'http:// または https:// で始まるURLを入力してください';
-  }
-  if (input.memo && input.memo.length > LIMITS.memoMax) {
-    errors.memo = `${LIMITS.memoMax}文字以内で入力してください`;
   }
   return errors;
 }
