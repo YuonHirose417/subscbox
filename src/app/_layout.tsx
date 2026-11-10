@@ -8,12 +8,16 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ErrorState } from '@/components/ui';
 import { useAdsBootstrap } from '@/features/ads/useAdsBootstrap';
+import { SPLASH_FADE_MS, splashHideDelay } from '@/features/app/splash';
 import { useAppInit } from '@/features/app/useAppInit';
 import { useNotificationTap } from '@/features/notifications/useNotificationTap';
 import { configureNotificationHandler } from '@/services/notifications';
 import { ThemeProvider, useTheme } from '@/theme';
 
+// スプラッシュ画面は最短 1.2 秒表示し、フェードで消す（準備に時間がかかったときは準備ができ次第すぐ消す）
+const splashShownAt = Date.now();
 SplashScreen.preventAutoHideAsync().catch(() => {});
+SplashScreen.setOptions({ fade: true, duration: SPLASH_FADE_MS });
 configureNotificationHandler();
 
 function RootStack() {
@@ -23,7 +27,12 @@ function RootStack() {
   useAdsBootstrap(status === 'ready');
 
   useEffect(() => {
-    if (status !== 'loading') SplashScreen.hideAsync().catch(() => {});
+    if (status === 'loading') return;
+    const timer = setTimeout(
+      () => SplashScreen.hideAsync().catch(() => {}),
+      splashHideDelay(splashShownAt, Date.now()),
+    );
+    return () => clearTimeout(timer);
   }, [status]);
 
   if (status === 'loading') return null; // スプラッシュを表示したまま待つ

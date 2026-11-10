@@ -54,7 +54,9 @@ export class MockPremiumService implements PremiumService {
     };
   }
 
+  /** 開発用の切り替え（デザインカタログ）。状態はメモリだけに持ち、保存しない。本番ビルドでは何もしない */
   setPremiumForDev(value: boolean): void {
+    if (!__DEV__) return;
     this.isPremium = value;
     this.listeners.forEach((cb) => cb(value));
   }
