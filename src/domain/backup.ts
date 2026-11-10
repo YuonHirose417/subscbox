@@ -186,7 +186,7 @@ export function parseBackup(text: string): ParseResult {
     return { ok: false, errors: ['JSONとして読み込めませんでした'] };
   }
   if (!isObj(raw) || raw.format !== BACKUP_FORMAT) {
-    return { ok: false, errors: ['サブスクBoxのバックアップファイルではありません'] };
+    return { ok: false, errors: ['SubscBoxのバックアップファイルではありません'] };
   }
   if (!isInt(raw.schemaVersion) || raw.schemaVersion < 1) {
     return { ok: false, errors: ['バックアップの形式のバージョンが正しくありません'] };

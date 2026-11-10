@@ -17,7 +17,7 @@ function ask(title: string, message: string, ok: string, cancel = 'あとで'): 
 export async function promptOpenSettings(): Promise<void> {
   const open = await ask(
     '通知がオフになっています',
-    '更新日の前にお知らせするには、設定アプリで「サブスクBox」の通知を許可してください。',
+    '更新日の前にお知らせするには、設定アプリで「SubscBox」の通知を許可してください。',
     '設定を開く',
   );
   if (open) await Linking.openSettings();

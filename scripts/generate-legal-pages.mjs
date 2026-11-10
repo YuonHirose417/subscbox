@@ -22,7 +22,7 @@ function page(title, body) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escape(title)} | サブスクBox</title>
+<title>${escape(title)} | SubscBox</title>
 <style>
   :root { color-scheme: light dark; --bg: #F5F6FA; --surface: #FFFFFF; --text: #0F172A; --sub: #56667D; --accent: #3D63E8; }
   @media (prefers-color-scheme: dark) { :root { --bg: #0B0D14; --surface: #151823; --text: #F1F5F9; --sub: #94A3B8; --accent: #7397FF; } }
@@ -40,7 +40,7 @@ function page(title, body) {
 </head>
 <body>
 <main>
-<nav><a href="./">サブスクBox</a><a href="privacy.html">プライバシーポリシー</a><a href="terms.html">利用規約</a></nav>
+<nav><a href="./">SubscBox</a><a href="privacy.html">プライバシーポリシー</a><a href="terms.html">利用規約</a></nav>
 ${body}
 </main>
 </body>
@@ -60,7 +60,7 @@ function documentPage(title, sections) {
 const index = page(
   'サポート',
   [
-    '<h1>サブスクBox</h1>',
+    '<h1>SubscBox</h1>',
     '<p class="updated">サブスクリプションを手入力で管理する iPhone アプリ</p>',
     '<section><h2>お問い合わせ</h2><p>ご質問・不具合のご報告は <a href="mailto:' + CONTACT + '">' + CONTACT + '</a> までご連絡ください。</p></section>',
     '<section><h2>ドキュメント</h2><p><a href="privacy.html">プライバシーポリシー</a><br><a href="terms.html">利用規約</a></p></section>',

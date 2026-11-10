@@ -5,7 +5,7 @@ export type Section = { heading: string; body: string };
 export const faqItems: readonly Section[] = [
   {
     heading: '金額や更新日は自動で取得されますか？',
-    body: 'いいえ。サブスクBoxは各サービスと連携しておらず、金額・更新日・利用状況はすべてご自身で入力した内容をもとに表示しています。表示される金額や支払い履歴は目安です。実際の請求額は各サービスの明細でご確認ください。',
+    body: 'いいえ。SubscBoxは各サービスと連携しておらず、金額・更新日・利用状況はすべてご自身で入力した内容をもとに表示しています。表示される金額や支払い履歴は目安です。実際の請求額は各サービスの明細でご確認ください。',
   },
   {
     heading: '支払い履歴はどのように作られますか？',
@@ -13,7 +13,7 @@ export const faqItems: readonly Section[] = [
   },
   {
     heading: '通知が届きません',
-    body: '設定 → 通知設定 で「更新前に通知する」がオンになっているか、iPhoneの「設定」→「通知」→「サブスクBox」で通知が許可されているかをご確認ください。通知は近い順に最大50件まで予約し、アプリを開くたびに入れ替えます。',
+    body: '設定 → 通知設定 で「更新前に通知する」がオンになっているか、iPhoneの「設定」→「通知」→「SubscBox」で通知が許可されているかをご確認ください。通知は近い順に最大50件まで予約し、アプリを開くたびに入れ替えます。',
   },
   {
     heading: 'データはどこに保存されますか？',
@@ -30,12 +30,12 @@ export const faqItems: readonly Section[] = [
 ];
 
 /** 制定日・最終改定日（規約・ポリシーを変えたら更新する） */
-export const LEGAL_UPDATED_AT = '2026年11月10日';
+export const LEGAL_UPDATED_AT = '2026年11月11日';
 
 export const privacyPolicy: readonly Section[] = [
   {
     heading: 'はじめに',
-    body: 'サブスクBox（以下「本アプリ」）は、利用者の情報を次のとおり取り扱います。本アプリにはアカウント登録の機能はありません。',
+    body: 'SubscBox（以下「本アプリ」）は、利用者の情報を次のとおり取り扱います。本アプリにはアカウント登録の機能はありません。',
   },
   {
     heading: '利用者が入力する情報',
@@ -74,7 +74,7 @@ export const privacyPolicy: readonly Section[] = [
 export const termsOfUse: readonly Section[] = [
   {
     heading: '本アプリについて',
-    body: 'サブスクBox（以下「本アプリ」）は、利用者が自身のサブスクリプションを手動で記録・管理するためのツールです。本アプリは各サービスの提供者とは関係がなく、各サービスと連携していません。',
+    body: 'SubscBox（以下「本アプリ」）は、利用者が自身のサブスクリプションを手動で記録・管理するためのツールです。本アプリは各サービスの提供者とは関係がなく、各サービスと連携していません。',
   },
   {
     heading: '表示内容',

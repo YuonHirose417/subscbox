@@ -124,7 +124,7 @@ export async function scheduleTestNotificationForDev(
   await Notifications.scheduleNotificationAsync({
     content: {
       title: 'テスト通知',
-      body: 'サブスクBoxのテスト通知です',
+      body: 'SubscBoxのテスト通知です',
       data: subscriptionId ? { subscriptionId } : {},
     },
     trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds },

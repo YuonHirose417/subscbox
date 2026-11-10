@@ -1,4 +1,4 @@
-# サブスクBox 公開までの手作業の手順書
+# SubscBox 公開までの手作業の手順書
 
 コードの側で済ませたこと（RevenueCat・AdMob の組み込み、ペイウォール、規約ページの生成、`eas.json`）を前提に、ご自身で行う作業を順番にまとめています。上から順に進めてください。
 
@@ -63,7 +63,7 @@ AdMob は、App Store に登録した「マーケティング URL / サポート
 ☐ Apple Developer → Certificates, Identifiers & Profiles → Identifiers で `com.yuonhirose.subscbox` の App ID を作る（EAS Build でも自動で作れますが、先に作っておくと確実です）
   - Capabilities は **In-App Purchase** のみ（プッシュ通知は使いません）
 ☐ App Store Connect →「アプリ」→「＋」→ 新規 App
-  - プラットフォーム：iOS ／ 名前：サブスクBox（使用済みなら「サブスクBox - サブスク管理」など）／ プライマリ言語：日本語 ／ バンドル ID：`com.yuonhirose.subscbox` ／ SKU：`subscbox`
+  - プラットフォーム：iOS ／ 名前：SubscBox（2026-11-11 に「サブスクBox」から変更。App 情報 → 名前 で変える）／ プライマリ言語：日本語 ／ バンドル ID：`com.yuonhirose.subscbox` ／ SKU：`subscbox`
 
 📝 Apple ID（数字の App ID。App 情報 → 一般情報に表示される）→ `eas submit` で使う
 
@@ -92,7 +92,7 @@ AdMob は、App Store に登録した「マーケティング URL / サポート
 
 ## 3. RevenueCat
 
-☐ RevenueCat にサインアップし、プロジェクト「サブスクBox」を作る
+☐ RevenueCat にサインアップし、プロジェクト「SubscBox」を作る
 ☐ Apps → ＋ → **App Store**
   - Bundle ID：`com.yuonhirose.subscbox`
   - In-App Purchase Key：2-4 の `.p8`・キー ID・Issuer ID を登録
@@ -108,7 +108,7 @@ AdMob は、App Store に登録した「マーケティング URL / サポート
 
 ## 4. AdMob
 
-☐ AdMob にサインアップし、アプリ →「アプリを追加」→ iOS →「App Store に公開されていない」を選んで「サブスクBox」を追加
+☐ AdMob にサインアップし、アプリ →「アプリを追加」→ iOS →「App Store に公開されていない」を選んで「SubscBox」を追加
 ☐ 広告ユニット →「バナー」を作成（名前：一覧・分析の末尾）
 
 📝 `EXPO_PUBLIC_ADMOB_IOS_APP_ID`（`ca-app-pub-…~…`）
@@ -208,8 +208,8 @@ AdMob と RevenueCat が収集するデータを申告します。最新の内�
 ☐ サポート URL：手順 1 のサポートページ
 ☐ 年齢区分：4+（質問票はすべて「なし」。広告は AdMob 側で G に制限）
 ☐ スクリーンショット：6.9 インチ（1320×2868）必須、6.5 インチ推奨
-  - **他社のロゴを写さない**（ガイドライン 5.2）。アプリはロゴを同梱しておらず頭文字のアイコンで表示されるので、開発用の「サンプルを投入」のデータで撮影できます
-☐ 説明文・キーワード・サブタイトル
+  - **他社のロゴを写さない**（ガイドライン 5.2）。アプリは 7 サービス（Amazon Prime・ChatGPT・Disney+・Notion・Spotify・X Premium・YouTube）のロゴを同梱している。撮影用のデータには、これらを入れない（開発用の「サンプルを投入」には YouTube と Spotify が入っているので、撮影前に削除する）
+☐ 説明文・キーワード・サブタイトル：`release/STORE_LISTING.md` の下書きを貼る
 ☐ 審査メモ（例）：
 
 ```

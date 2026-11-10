@@ -2,7 +2,8 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'サブスクBox',
+  // アプリ名（ホーム画面の表示名にもなる）。App Store Connect のアプリ名も SubscBox
+  name: 'SubscBox',
   slug: 'subscbox',
   // EAS（Expo アカウント yuon）。Distribution Certificate を hairlog と共用するため同じアカウントに置く
   owner: 'yuon',
@@ -16,10 +17,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     icon: './assets/images/icon.png',
     bundleIdentifier: 'com.yuonhirose.subscbox',
     supportsTablet: false,
-    infoPlist: {
-      // ホーム画面に表示する名前だけ英字にする（App Store のアプリ名は App Store Connect の「サブスクBox」のまま）
-      CFBundleDisplayName: 'SubscBox',
-    },
     config: {
       usesNonExemptEncryption: false,
     },

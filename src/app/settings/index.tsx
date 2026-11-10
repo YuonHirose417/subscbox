@@ -17,7 +17,7 @@ async function openContact() {
     return;
   }
   const isUrl = /^https:\/\//i.test(contact);
-  const subject = encodeURIComponent('サブスクBoxへのお問い合わせ');
+  const subject = encodeURIComponent('SubscBoxへのお問い合わせ');
   const body = encodeURIComponent(`\n\n----\nアプリのバージョン：${APP_VERSION}`);
   try {
     if (isUrl) await WebBrowser.openBrowserAsync(contact);

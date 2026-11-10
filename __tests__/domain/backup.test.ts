@@ -75,7 +75,7 @@ describe('createBackup / parseBackup', () => {
     expect(parseBackup('not json')).toMatchObject({ ok: false });
     expect(parseBackup('{"foo":1}')).toEqual({
       ok: false,
-      errors: ['サブスクBoxのバックアップファイルではありません'],
+      errors: ['SubscBoxのバックアップファイルではありません'],
     });
     expect(
       parseBackup(JSON.stringify({ format: BACKUP_FORMAT, schemaVersion: 99, data: {} })),

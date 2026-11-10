@@ -1,6 +1,6 @@
 /** 画面に出す文言を集約する（将来の多言語化に備える） */
 export const ja = {
-  appName: 'サブスクBox',
+  appName: 'SubscBox',
   common: {
     seeAll: 'すべて見る',
     retry: '再試行',
