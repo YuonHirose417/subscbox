@@ -4,6 +4,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'サブスクBox',
   slug: 'subscbox',
+  // EAS（Expo アカウント yuon）。Distribution Certificate を hairlog と共用するため同じアカウントに置く
+  owner: 'yuon',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
@@ -69,6 +71,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
   ],
+  extra: {
+    ...config.extra,
+    eas: { projectId: 'f764f772-569e-4859-adee-fecad9b7d193' },
+  },
   experiments: {
     typedRoutes: true,
     reactCompiler: true,
