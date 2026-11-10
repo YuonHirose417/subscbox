@@ -115,8 +115,7 @@ AdMob は、App Store に登録した「マーケティング URL / サポート
 📝 `EXPO_PUBLIC_ADMOB_IOS_BANNER_ID`（`ca-app-pub-…/…`）
 
 ☐ ブロックのコントロール → コンテンツ →「広告コンテンツの上限」を **G（全年齢）** にする（App Store の年齢区分 4+ に合わせる）
-☐ プライバシーとメッセージ → **GDPR（欧州）** のメッセージを作成して公開する（EEA・英国の利用者には同意画面が出ます。アプリ側は対応済み）
-  - 「広告のプライバシー設定」の行は、対象の地域でだけ「よくある質問」画面の下部に出ます
+☐ （不要）GDPR（欧州）のメッセージ：日本のみで配信するため作らない（2026-11-10 決定）。アプリ側の同意処理は残してあり、メッセージが無ければ何も表示されない
 ☐ アプリが App Store に公開されたら、AdMob のアプリ設定で App Store のアプリをリンクし、表示された `app-ads.txt` の行を手順 1 のファイルに書く
 
 > 開発中（development build）は自動的に Google のテスト広告が出ます。**自分の本番広告を何度もタップしないでください**（アカウント停止の原因になります）。実機の本番広告を確認したいときは AdMob の「テストデバイス」に iPhone を登録してください。
@@ -152,7 +151,7 @@ npx eas-cli@latest env:create --name EXPO_PUBLIC_ADMOB_IOS_BANNER_ID --value "ca
   1. Build profile：`production` を選ぶ
   2. 「Distribution Certificate」の設定 → **既存の証明書を使う**（Use an existing Distribution Certificate）を選び、一覧から選択（または `.p12` とパスワードをアップロード）
   3. 「Provisioning Profile」→ subscbox 用に**新規作成してよい**（EAS に生成させる）
-  4. `development` プロファイルでも同様に（Development 証明書は上限の対象外ですが、既存があれば再利用してかまいません）
+  4. `development` プロファイル（`distribution: internal`）は Ad Hoc 配布なので、こちらも **Distribution Certificate を使う**。同じく既存の証明書を再利用し、新規作成しない（端末の登録後、手順 5-4 のビルド時に設定される）
 ☐ `eas build` の途中で **「Generate a new Apple Distribution Certificate?」と聞かれたら必ず No** を選び、既存のものを選択する
 
 ### 5-4. development build（購入・広告・通知の確認用）
