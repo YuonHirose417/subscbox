@@ -55,9 +55,8 @@ AdMob は、App Store に登録した「マーケティング URL / サポート
     google.com, pub-2751115733594073, DIRECT, f08c47fec0942fa0
     ```
   - `.nojekyll`（Jekyll で加工させない）と `.gitattributes`（改行を CRLF に変えない）も置いてある
-☐ AdMob → アプリ → SubscBox →「app-ads.txt」で、状態が「確認済み」になるのを待つ（クロールに 24 時間ほどかかる）
-  - App Store に登録したサポート URL（`https://yuonhirose417.github.io/subscbox/`）のホストのルートに置いているので、そのまま見つかる想定
-  - 「見つかりません」のままのときは、次のバージョンで App Store Connect の「マーケティング URL」に `https://yuonhirose417.github.io/` を入れる（マーケティング URL はバージョンの情報なので、新しいバージョンでないと変えられない）
+☑ App Store Connect の「マーケティング URL」は `https://yuonhirose417.github.io/` に設定済み（2026-11-18 確認。AdMob はマーケティング URL のドメインのルートにある `app-ads.txt` を見る）
+☐ あとは AdMob の確認を待つだけ：AdMob → アプリ → SubscBox →「app-ads.txt」で、状態が「確認済み」になる（最大 24 時間）
 ☐ 広告主の追加などで行が増えたときは、`yuonhirose417.github.io` リポジトリの `app-ads.txt` を編集して push する（他のアプリで AdMob を使うときも、同じパブリッシャー ID なら同じ1行でよい）
 
 ---
