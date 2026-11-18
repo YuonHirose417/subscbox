@@ -47,8 +47,18 @@
 
 AdMob は、App Store に登録した「マーケティング URL / サポート URL」の**ドメインのルート**に `app-ads.txt` を置くことを求めます。`https://<ユーザー名>.github.io/subscbox/` のようなプロジェクトサイトでは、ルート（`https://<ユーザー名>.github.io/app-ads.txt`）に置けません。
 
-☐ GitHub で `<ユーザー名>.github.io` という名前の Public リポジトリを作り、ルートに `app-ads.txt` を置いて Pages を有効にする（中身は手順 4 で AdMob が表示する 1 行）
-☐ App Store Connect の「マーケティング URL」に `https://<ユーザー名>.github.io/` を入れる
+☑ GitHub で `<ユーザー名>.github.io` という名前の Public リポジトリを作り、ルートに `app-ads.txt` を置いて Pages を有効にする（2026-11-18 完了）
+  - リポジトリ：`YuonHirose417/yuonhirose417.github.io`（`main` ブランチのルートから公開）
+  - 公開 URL：`https://yuonhirose417.github.io/app-ads.txt`（HTTPS で 200・リダイレクトなし。HTTP は GitHub が HTTPS へ 301 で転送する）
+  - 中身（1行、末尾に改行）：
+    ```
+    google.com, pub-2751115733594073, DIRECT, f08c47fec0942fa0
+    ```
+  - `.nojekyll`（Jekyll で加工させない）と `.gitattributes`（改行を CRLF に変えない）も置いてある
+☐ AdMob → アプリ → SubscBox →「app-ads.txt」で、状態が「確認済み」になるのを待つ（クロールに 24 時間ほどかかる）
+  - App Store に登録したサポート URL（`https://yuonhirose417.github.io/subscbox/`）のホストのルートに置いているので、そのまま見つかる想定
+  - 「見つかりません」のままのときは、次のバージョンで App Store Connect の「マーケティング URL」に `https://yuonhirose417.github.io/` を入れる（マーケティング URL はバージョンの情報なので、新しいバージョンでないと変えられない）
+☐ 広告主の追加などで行が増えたときは、`yuonhirose417.github.io` リポジトリの `app-ads.txt` を編集して push する（他のアプリで AdMob を使うときも、同じパブリッシャー ID なら同じ1行でよい）
 
 ---
 
@@ -116,7 +126,7 @@ AdMob は、App Store に登録した「マーケティング URL / サポート
 
 ☐ ブロックのコントロール → コンテンツ →「広告コンテンツの上限」を **G（全年齢）** にする（App Store の年齢区分 4+ に合わせる）
 ☐ （不要）GDPR（欧州）のメッセージ：日本のみで配信するため作らない（2026-11-10 決定）。アプリ側の同意処理は残してあり、メッセージが無ければ何も表示されない
-☐ アプリが App Store に公開されたら、AdMob のアプリ設定で App Store のアプリをリンクし、表示された `app-ads.txt` の行を手順 1 のファイルに書く
+☐ アプリが App Store に公開されたら、AdMob のアプリ設定で App Store のアプリをリンクし、表示された `app-ads.txt` の行を手順 1 のファイルに書く（2026-11-18：`app-ads.txt` は設置済み。手順 1 を参照）
 
 > 開発中（development build）は自動的に Google のテスト広告が出ます。**自分の本番広告を何度もタップしないでください**（アカウント停止の原因になります）。実機の本番広告を確認したいときは AdMob の「テストデバイス」に iPhone を登録してください。
 
