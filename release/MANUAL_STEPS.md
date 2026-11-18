@@ -45,7 +45,7 @@
 
 ### app-ads.txt（AdMob 用）
 
-AdMob は、App Store に登録した「マーケティング URL / サポート URL」の**ドメインのルート**に `app-ads.txt` を置くことを求めます。`https://<ユーザー名>.github.io/subscbox/` のようなプロジェクトサイトでは、ルート（`https://<ユーザー名>.github.io/app-ads.txt`）に置けません。
+AdMob は、App Store に登録した「マーケティング URL」の**ドメインのルート**に `app-ads.txt` を置くことを求めます。`https://<ユーザー名>.github.io/subscbox/` のようなプロジェクトサイトでは、ルート（`https://<ユーザー名>.github.io/app-ads.txt`）に置けません。
 
 ☑ GitHub で `<ユーザー名>.github.io` という名前の Public リポジトリを作り、ルートに `app-ads.txt` を置いて Pages を有効にする（2026-11-18 完了）
   - リポジトリ：`YuonHirose417/yuonhirose417.github.io`（`main` ブランチのルートから公開）
