@@ -13,7 +13,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'subscbox',
   userInterfaceStyle: 'automatic',
   ios: {
-    // アプリアイコン（assets/images/icon-source.png から 1024×1024・透過なしで作ったもの）
+    // ホーム画面のアプリアイコン（1024×1024・透過なし）
     icon: './assets/images/icon.png',
     bundleIdentifier: 'com.yuonhirose.subscbox',
     supportsTablet: false,
@@ -23,17 +23,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     package: 'com.yuonhirose.subscbox',
-    adaptiveIcon: {
-      backgroundColor: '#000000',
-      foregroundImage: './assets/images/android-icon-foreground.png',
-      backgroundImage: './assets/images/android-icon-background.png',
-      monochromeImage: './assets/images/android-icon-monochrome.png',
-    },
     predictiveBackGestureEnabled: false,
   },
   web: {
     output: 'static',
-    favicon: './assets/images/favicon.png',
   },
   plugins: [
     'expo-router',
